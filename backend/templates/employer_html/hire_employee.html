@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hire {{ employee.full_name }} - WorkNest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #3a86ff;
+            --primary-light: #e6f0ff;
+            --primary-dark: #2667cc;
+            --secondary: #8338ec;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .employee-info {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .employee-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .employee-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+            font-size: 2rem;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .employee-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .employee-details h2 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .employee-details .job-title {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--warning);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .info-item {
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .hire-form {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .date-time-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 576px) {
+            .date-time-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .availability-calendar {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 8px;
+        }
+
+        .calendar-header {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-day {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+
+        .calendar-day.available {
+            background: var(--success);
+            color: var(--white);
+            border-color: var(--success);
+        }
+
+        .calendar-day.unavailable {
+            background: var(--gray-light);
+            color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .calendar-day.selected {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.3);
+        }
+
+        .legend {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--gray-light);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray);
+            color: var(--white);
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+
+        .messages-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .message {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .availability-note {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-briefcase"></i> Hire {{ employee.full_name }}</h1>
+            <p>Send a job request to this skilled professional</p>
+        </div>
+
+        <!-- Messages Display -->
+        {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                <i class="fas 
+                    {% if message.tags == 'success' %}fa-check-circle
+                    {% elif message.tags == 'error' %}fa-exclamation-circle
+                    {% else %}fa-info-circle{% endif %}">
+                </i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="content-wrapper">
+            <!-- Employee Information -->
+            <div class="employee-info">
+                <div class="employee-header">
+                    <div class="employee-avatar">
+                        {% if employee.profile_image %}
+                            <img src="{{ employee.profile_image.url }}" alt="{{ employee.full_name }}">
+                        {% else %}
+                            {{ employee.first_name|slice:1 }}{{ employee.last_name|slice:1 }}
+                        {% endif %}
+                    </div>
+                    <div class="employee-details">
+                        <h2>{{ employee.full_name }}</h2>
+                        <div class="job-title">{{ employee.job_title|default:"Skilled Professional" }}</div>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>{{ employee.rating|floatformat:1 }}/5.0</span>
+                            <span>({{ employee.total_jobs_done }} jobs)</span>
+                        </div>
+                        <div class="availability-status">
+                            <i class="fas fa-circle" style="color: 
+                                {% if employee.availability == 'available' %}#06d6a0
+                                {% elif employee.availability == 'busy' %}#ffd166
+                                {% else %}#ef476f{% endif %};"></i>
+                            <span>{{ employee.availability_status }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Experience</div>
+                        <div class="info-value">{{ employee.years_experience }} years</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Response Time</div>
+                        <div class="info-value">{{ employee.response_time }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Location</div>
+                        <div class="info-value">{{ employee.city|default:"Not specified" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Service Radius</div>
+                        <div class="info-value">{{ employee.service_radius }} km</div>
+                    </div>
+                </div>
+
+                <div class="availability-note">
+                    <p><strong>Note:</strong> {{ employee.full_name }} is currently 
+                    <strong>{{ employee.availability }}</strong> and typically responds 
+                    within <strong>{{ employee.response_time }}</strong>.</p>
+                    <p>Please select an available date from the calendar.</p>
+                </div>
+            </div>
+
+            <!-- Hiring Form -->
+            <div class="hire-form">
+                <form method="post" action="{% url 'hire_employee' employee.employee_id %}">
+                    {% csrf_token %}
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Fill in the job details below. The worker will review your request and respond.
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job_title">Job Title *</label>
+                        <input type="text" id="job_title" name="job_title" class="form-control" 
+                               placeholder="e.g., Bathroom Plumbing Repair" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job_description">Job Description *</label>
+                        <textarea id="job_description" name="job_description" class="form-control" 
+                                  placeholder="Describe the work needed in detail..." required></textarea>
+                    </div>
+
+                    <div class="date-time-group">
+                        <div class="form-group">
+                            <label for="proposed_date">Proposed Date *</label>
+                            <input type="date" id="proposed_date" name="proposed_date" 
+                                   class="form-control" min="{{ today }}" max="{{ max_date }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="proposed_time">Preferred Time (Optional)</label>
+                            <input type="time" id="proposed_time" name="proposed_time" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Availability Calendar -->
+                    <div class="availability-calendar">
+                        <div class="calendar-header">
+                            <i class="fas fa-calendar-alt"></i> Available Dates (Next 30 Days)
+                        </div>
+                        <div class="calendar-grid">
+                            {% for day in availability %}
+                                <div class="calendar-day {% if day.available %}available{% else %}unavailable{% endif %}"
+                                     data-date="{{ day.date_str }}"
+                                     title="{{ day.day_name }} - {% if day.available %}Available{% else %}Not Available{% endif %}">
+                                    {{ day.date.day }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--success);"></div>
+                                <span>Available</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--gray-light);"></div>
+                                <span>Not Available</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--primary);"></div>
+                                <span>Selected</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estimated_duration">Estimated Duration (Optional)</label>
+                        <input type="text" id="estimated_duration" name="estimated_duration" 
+                               class="form-control" placeholder="e.g., 3-4 hours, Full day">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="budget">Budget (Optional)</label>
+                        <input type="number" id="budget" name="budget" class="form-control" 
+                               placeholder="e.g., 1500" step="0.01" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Job Location *</label>
+                        <input type="text" id="location" name="location" class="form-control" 
+                               placeholder="e.g., Home, Office, Construction Site" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Full Address</label>
+                        <textarea id="address" name="address" class="form-control" 
+                                  placeholder="Street address, landmark, etc." rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">City/Town</label>
+                        <input type="text" id="city" name="city" class="form-control" 
+                               placeholder="e.g., Mumbai">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state" name="state" class="form-control" 
+                               placeholder="e.g., Maharashtra">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priority">Priority Level</label>
+                        <select id="priority" name="priority" class="form-control">
+                            <option value="normal">Normal</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="asap">ASAP (Highest Priority)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="employer_notes">Additional Notes (Optional)</label>
+                        <textarea id="employer_notes" name="employer_notes" class="form-control" 
+                                  placeholder="Any special instructions or requirements..." rows="3"></textarea>
+                    </div>
+
+                    <div class="actions">
+                        <a href="{% url 'employer_find_workers' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <i class="fas fa-paper-plane"></i> Send Job Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Calendar date selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarDays = document.querySelectorAll('.calendar-day.available');
+            const dateInput = document.getElementById('proposed_date');
+            
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            if (dateInput && !dateInput.value) {
+                dateInput.value = today;
+            }
+            
+            // Add click handler to available days
+            calendarDays.forEach(day => {
+                day.addEventListener('click', function() {
+                    const selectedDate = this.getAttribute('data-date');
+                    
+                    // Update the date input
+                    if (dateInput) {
+                        dateInput.value = selectedDate;
+                    }
+                    
+                    // Remove selected class from all days
+                    calendarDays.forEach(d => d.classList.remove('selected'));
+                    
+                    // Add selected class to clicked day
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Highlight the initially selected date
+            if (dateInput && dateInput.value) {
+                const selectedDate = dateInput.value;
+                const matchingDay = document.querySelector(`.calendar-day[data-date="${selectedDate}"]`);
+                if (matchingDay && matchingDay.classList.contains('available')) {
+                    matchingDay.classList.add('selected');
+                }
+            }
+            
+            // Auto-update calendar selection when date input changes
+            if (dateInput) {
+                dateInput.addEventListener('change', function() {
+                    const selectedDate = this.value;
+                    
+                    // Remove selected class from all days
+                    calendarDays.forEach(d => d.classList.remove('selected'));
+                    
+                    // Add selected class to matching day
+                    const matchingDay = document.querySelector(`.calendar-day[data-date="${selectedDate}"]`);
+                    if (matchingDay && matchingDay.classList.contains('available')) {
+                        matchingDay.classList.add('selected');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job History - WorkNest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #3a86ff;
+            --primary-light: #e6f0ff;
+            --primary-dark: #1a5fd8;
+            --secondary: #8338ec;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+            --card-bg: #ffffff;
+            --sidebar-bg: #1a2238;
+            --sidebar-text: #b0b7c3;
+            --sidebar-active: #3a86ff;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: fixed;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 1.5rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
+            border-left: 4px solid var(--primary);
+        }
+
+        .sidebar-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-close {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 0;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .page-title p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            position: relative;
+        }
+
+        .notification-icon i {
+            font-size: 1.3rem;
+            color: var(--gray);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .user-profile:hover {
+            background: var(--gray-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+            font-size: 1.1rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            width: 220px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 20px;
+            width: 16px;
+            height: 16px;
+            background: var(--white);
+            transform: rotate(45deg);
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        .dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropdown-header .user-avatar {
+            width: 45px;
+            height: 45px;
+        }
+
+        .dropdown-header .user-info .user-name {
+            font-size: 1rem;
+        }
+
+        .dropdown-header .user-info .user-email {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-menu li {
+            margin: 0;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-menu a:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .dropdown-menu i {
+            margin-right: 10px;
+            width: 18px;
+            text-align: center;
+            color: var(--gray);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 0.5rem 0;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .stat-info p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .bg-blue { background: var(--primary); }
+        .bg-green { background: var(--success); }
+        .bg-orange { background: var(--warning); }
+        .bg-pink { background: var(--danger); }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2.5rem 0 1.5rem;
+        }
+
+        .section-header h2 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        /* Search and Filter Bar */
+        .search-filter-bar {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .filter-dropdown {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .btn-filter {
+            padding: 12px 20px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: background 0.3s;
+        }
+
+        .btn-filter:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Job History Card */
+        .job-history-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .job-history-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--shadow-lg);
+        }
+
+        .job-history-header {
+            padding: 1.5rem;
+            background: var(--primary-light);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .job-history-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .job-history-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .job-history-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .job-history-meta-item i {
+            color: var(--primary);
+        }
+
+        .job-history-body {
+            padding: 1.5rem;
+        }
+
+        .job-history-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .job-history-actions {
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-light);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: rgba(6, 214, 160, 0.2);
+            color: var(--success);
+        }
+
+        .status-in-progress {
+            background: rgba(58, 134, 255, 0.2);
+            color: var(--primary);
+        }
+
+        .status-cancelled {
+            background: rgba(239, 71, 111, 0.2);
+            color: var(--danger);
+        }
+
+        /* Payment Details Page */
+        .payment-details-page {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .payment-header h2 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .payment-summary {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(58, 134, 255, 0.1) 0%, rgba(131, 56, 236, 0.1) 100%);
+            border-radius: 12px;
+            border-left: 4px solid var(--success);
+        }
+
+        .payment-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 10px 0;
+        }
+
+        .payment-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .status-paid {
+            background: rgba(6, 214, 160, 0.15);
+            color: var(--success);
+        }
+
+        .status-cancelled-modal {
+            background: rgba(239, 71, 111, 0.15);
+            color: var(--danger);
+        }
+
+        .payment-details-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .detail-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--white);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .detail-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .modal-detail-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-detail-label i {
+            color: var(--primary);
+            width: 20px;
+        }
+
+        .modal-detail-value {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .highlight-card {
+            background: linear-gradient(135deg, rgba(58, 134, 255, 0.1) 0%, rgba(131, 56, 236, 0.1) 100%);
+            border: none;
+            padding: 1.2rem;
+        }
+
+        .cancellation-info {
+            background: linear-gradient(135deg, rgba(239, 71, 111, 0.1) 0%, rgba(255, 209, 102, 0.1) 100%);
+            border: none;
+            padding: 1.2rem;
+        }
+
+        /* Review Details Page */
+        .review-details-page {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .review-item {
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .review-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .review-header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .reviewer-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+            font-size: 1rem;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .review-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .review-rating {
+            color: #ffc107;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-number {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .review-comment {
+            color: var(--text-dark);
+            line-height: 1.6;
+            font-size: 0.95rem;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .no-reviews i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--gray-light);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 3rem;
+        }
+
+        .pagination-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .pagination-btn.active, .pagination-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        /* Menu Toggle for Mobile */
+        .menu-toggle {
+            display: none;
+            background: var(--primary);
+            border: none;
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* No Data Message */
+        .no-jobs {
+            text-align: center;
+            padding: 3rem;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .no-jobs i {
+            font-size: 3rem;
+            color: var(--gray-light);
+            margin-bottom: 1rem;
+        }
+
+        .no-jobs h3 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .no-jobs p {
+            color: var(--text-light);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .job-history-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-close {
+                display: block;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .top-bar {
+                padding: 1rem;
+            }
+            
+            .dashboard-content {
+                padding: 1.5rem;
+            }
+            
+            .menu-toggle {
+                margin-right: 10px;
+            }
+            
+            .stat-card {
+                padding: 1.2rem;
+            }
+            
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .stat-info h3 {
+                font-size: 1.6rem;
+            }
+            
+            .search-filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .filter-dropdown {
+                width: 100%;
+            }
+            
+            .job-history-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .job-history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .job-history-actions {
+                flex-direction: column;
+            }
+            
+            .job-history-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .user-info {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 0.8rem;
+            }
+            
+            .page-title h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+            
+            .stat-info h3 {
+                font-size: 1.5rem;
+                margin-bottom: 2px;
+            }
+            
+            .stat-info p {
+                font-size: 0.8rem;
+            }
+            
+            .user-dropdown {
+                width: 200px;
+                right: -10px;
+            }
+            
+            .filter-options {
+                flex-wrap: wrap;
+            }
+            
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-card {
+                flex-direction: row;
+                text-align: left;
+            }
+            
+            .page-title h1 {
+                font-size: 1.3rem;
+            }
+            
+            .page-title p {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay for Mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    {% include 'employee_html/employee_header.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <h1>JOB HISTORY</h1>
+                <p>View your past job activities and performance</p>
+            </div>
+
+            {% include 'employee_html/employee_dropdown.html' %}
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Check if we're viewing payment details -->
+            {% if payment_details %}
+            <!-- Payment Details Page -->
+            <div class="payment-details-page">
+                <div class="payment-header">
+                    <h2>Payment Details - {{ payment_details.job.title }}</h2>
+                    <a href="{% url 'employee_job_history' %}" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Job History
+                    </a>
+                </div>
+                
+                <div class="payment-summary">
+                    <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 10px;">{{ payment_details.job.title }}</div>
+                    <div class="payment-status {% if payment_details.paid %}status-paid{% else %}status-cancelled-modal{% endif %}">
+                        {% if payment_details.paid %}Paid Successfully{% else %}Job Cancelled{% endif %}
+                    </div>
+                    <div class="payment-amount">₹{{ payment_details.amount }}</div>
+                    <div style="color: var(--text-light); font-size: 0.9rem;">
+                        {% if payment_details.paid %}Amount Received{% else %}No Payment Received{% endif %}
+                    </div>
+                </div>
+                
+                <div class="payment-details-grid">
+                    <div class="detail-card highlight-card">
+                        <div class="modal-detail-label">
+                            <i class="fas fa-user"></i>
+                            Employer
+                        </div>
+                        <div class="modal-detail-value">{{ payment_details.employer_name }}</div>
+                    </div>
+                    
+                    <div class="detail-card">
+                        <div class="modal-detail-label">
+                            <i class="fas fa-credit-card"></i>
+                            Payment Method
+                        </div>
+                        <div class="modal-detail-value">{{ payment_details.payment_method|default:"N/A" }}</div>
+                    </div>
+                    
+                    <div class="detail-card">
+                        <div class="modal-detail-label">
+                            <i class="fas fa-hashtag"></i>
+                            Transaction ID
+                        </div>
+                        <div class="modal-detail-value">{{ payment_details.transaction_id|default:"N/A" }}</div>
+                    </div>
+                    
+                    <div class="detail-card">
+                        <div class="modal-detail-label">
+                            <i class="fas fa-calendar-check"></i>
+                            Payment Date
+                        </div>
+                        <div class="modal-detail-value">{{ payment_details.payment_date|date:"d M Y" }}</div>
+                    </div>
+                    
+                    <div class="detail-card">
+                        <div class="modal-detail-label">
+                            <i class="fas fa-clock"></i>
+                            Payment Time
+                        </div>
+                        <div class="modal-detail-value">{{ payment_details.payment_date|time:"H:i" }}</div>
+                    </div>
+                    
+                    <div class="detail-card">
+                        <div class="modal-detail-label">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Location
+                        </div>
+                        <div class="modal-detail-value">
+                            {% if payment_details.job.city %}{{ payment_details.job.city }}{% endif %}
+                            {% if payment_details.job.state %}, {{ payment_details.job.state }}{% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if not payment_details.paid %}
+                    <div class="detail-card cancellation-info">
+                        <div class="modal-detail-label">
+                            <i class="fas fa-info-circle"></i>
+                            Note
+                        </div>
+                        <div class="modal-detail-value">{{ payment_details.cancellation_reason|default:"Job was cancelled before completion" }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Check if we're viewing review details -->
+            {% elif review_details %}
+            <!-- Review Details Page -->
+            <div class="review-details-page">
+                <div class="review-header">
+                    <h2>Reviews - {{ review_details.job.title }}</h2>
+                    <a href="{% url 'employee_job_history' %}" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Job History
+                    </a>
+                </div>
+                
+                {% if review_details.reviews %}
+                    {% for review in review_details.reviews %}
+                    <div class="review-item">
+                        <div class="review-header-inner">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">
+                                    {{ review.employer.first_name|first|upper }}{{ review.employer.last_name|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="reviewer-name">{{ review.employer.full_name }}</div>
+                                    <div class="review-date">{{ review.created_at|date:"d M Y" }}</div>
+                                </div>
+                            </div>
+                            <div class="review-rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif forloop.counter == review.rating|add:0.5 %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="rating-number">{{ review.rating|floatformat:1 }}</span>
+                            </div>
+                        </div>
+                        <p class="review-comment">{{ review.text }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-reviews">
+                        <i class="fas fa-star"></i>
+                        <h3>No Reviews Yet</h3>
+                        <p>No reviews have been submitted for this job yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% else %}
+            <!-- Normal Job History List View -->
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.total_jobs }}</h3>
+                        <p>Total Jobs Done</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.completed_jobs }}</h3>
+                        <p>Completed Jobs</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ employee.rating|floatformat:1 }}</h3>
+                        <p>Average Rating</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-pink">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>₹{{ stats.total_earnings|floatformat:0 }}</h3>
+                        <p>Total Earnings----above working not coorecct it wan to take from the payment table----</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="search-filter-bar">
+                <form method="GET" action="{% url 'employee_job_history' %}" class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" placeholder="Search job history by title, employer, or location..." 
+                           value="{{ request.GET.search|default:'' }}">
+                </form>
+                <form method="GET" action="{% url 'employee_job_history' %}" style="display: contents;">
+                    <select class="filter-dropdown" name="status" onchange="this.form.submit()">
+                        <option value="all" {% if current_filters.status == 'all' %}selected{% endif %}>All Status</option>
+                        <option value="completed" {% if current_filters.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="accepted" {% if current_filters.status == 'accepted' %}selected{% endif %}>In Progress</option>
+                        <option value="cancelled" {% if current_filters.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="pending" {% if current_filters.status == 'pending' %}selected{% endif %}>Pending</option>
+                    </select>
+                    <select class="filter-dropdown" name="sort" onchange="this.form.submit()">
+                        <option value="newest" {% if current_filters.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="oldest" {% if current_filters.sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                        <option value="rating-high" {% if current_filters.sort == 'rating-high' %}selected{% endif %}>Rating: High to Low</option>
+                        <option value="rating-low" {% if current_filters.sort == 'rating-low' %}selected{% endif %}>Rating: Low to High</option>
+                    </select>
+                    <select class="filter-dropdown" name="time" onchange="this.form.submit()">
+                        <option value="all" {% if current_filters.time == 'all' %}selected{% endif %}>All Time</option>
+                        <option value="week" {% if current_filters.time == 'week' %}selected{% endif %}>This Week</option>
+                        <option value="month" {% if current_filters.time == 'month' %}selected{% endif %}>This Month</option>
+                        <option value="quarter" {% if current_filters.time == 'quarter' %}selected{% endif %}>Last 3 Months</option>
+                        <option value="year" {% if current_filters.time == 'year' %}selected{% endif %}>This Year</option>
+                    </select>
+                    <button type="submit" class="btn-filter" style="display: none;">Filter</button>
+                </form>
+            </div>
+
+            <!-- Section Header -->
+            <div class="section-header">
+                <h2>Your Job History</h2>
+                <div class="filter-options">
+                    <a href="?view=all" class="filter-btn {% if current_view == 'all' %}active{% endif %}">All Jobs</a>
+                    <a href="?time=month" class="filter-btn {% if current_filters.time == 'month' %}active{% endif %}">This Month</a>
+                    <a href="?sort=rating-high" class="filter-btn {% if current_filters.sort == 'rating-high' %}active{% endif %}">High Rating</a>
+                    <a href="?sort=earning-high" class="filter-btn {% if current_filters.sort == 'earning-high' %}active{% endif %}">High Earnings</a>
+                </div>
+            </div>
+
+            <!-- Job History Cards -->
+            <div class="job-history-list">
+                {% if job_history %}
+                    {% for job in job_history %}
+                    <div class="job-history-card">
+                        <div class="job-history-header">
+                            <div>
+                                <div class="job-history-title">{{ job.title }}</div>
+                                <div class="job-history-meta">
+                                    <div class="job-history-meta-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>
+                                            {% if job.city %}{{ job.city }}{% endif %}
+                                            {% if job.state %}, {{ job.state }}{% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="job-history-meta-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>
+                                            {% if job.status == 'completed' %}
+                                                Completed: {{ job.completed_at|timesince }} ago
+                                            {% elif job.status == 'cancelled' %}
+                                                Cancelled: {{ job.updated_at|timesince }} ago
+                                            {% else %}
+                                                Started: {{ job.accepted_at|timesince }} ago
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="job-history-meta-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Duration: {{ job.estimated_duration|default:"Not specified" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="status-badge 
+                                {% if job.status == 'completed' %}status-completed
+                                {% elif job.status == 'accepted' %}status-in-progress
+                                {% else %}status-cancelled{% endif %}">
+                                {{ job.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="job-history-body">
+                            <div class="job-history-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Employer</span>
+                                    <span class="detail-value">{{ job.employer.company_name|default:job.employer.first_name }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Amount {% if job.status == 'completed' %}Earned{% else %}Estimated{% endif %}</span>
+                                    <span class="detail-value">₹{{ job.budget|default:"0" }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Employer Rating</span>
+                                    <span class="detail-value">
+                                        {% with job.employer.reviews.all as reviews %}
+                                            {% if reviews %}
+                                                {{ reviews.0.rating|floatformat:1 }} ({{ reviews.count }} reviews)
+                                            {% else %}
+                                                No reviews yet
+                                            {% endif %}
+                                        {% endwith %}
+                                    </span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Payment Status</span>
+                                    <span class="detail-value">
+                                        {% if job.status == 'completed' %}
+                                            Paid (Online)
+                                        {% elif job.status == 'cancelled' %}
+                                            Not Paid
+                                        {% else %}
+                                            Pending
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="job-history-actions">
+                                <a href="{% url 'job_history_payment' job.job_id %}" class="btn btn-outline">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                                {% if job.status == 'completed' %}
+                                <a href="{% url 'job_history_review' job.job_id %}" class="btn btn-outline">
+                                    <i class="fas fa-star"></i> View Review
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-jobs">
+                        <i class="fas fa-briefcase"></i>
+                        <h3>No Job History Found</h3>
+                        <p>You don't have any job history yet. Your completed jobs will appear here.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Pagination -->
+            {% if job_history.has_other_pages %}
+            <div class="pagination">
+                {% if job_history.has_previous %}
+                    <a href="?page={{ job_history.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                {% endif %}
+                
+                {% for i in job_history.paginator.page_range %}
+                    {% if job_history.number == i %}
+                        <span class="pagination-btn active">{{ i }}</span>
+                    {% elif i > job_history.number|add:'-3' and i < job_history.number|add:'3' %}
+                        <a href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-btn">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if job_history.has_next %}
+                    <a href="?page={{ job_history.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const overlay = document.getElementById('overlay');
+        
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+        }
+        
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+        
+        // User profile dropdown toggle
+        const userProfile = document.getElementById('userProfile');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userProfile && userDropdown) {
+            userProfile.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('active');
+            });
+        }
+        
+        // Close sidebar when clicking on a menu item (for mobile)
+        const menuLinks = document.querySelectorAll('.sidebar-menu a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 992) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

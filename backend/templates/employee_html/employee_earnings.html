@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnings - WorkNest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #3a86ff;
+            --primary-light: #e6f0ff;
+            --primary-dark: #1a5fd8;
+            --secondary: #8338ec;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+            --card-bg: #ffffff;
+            --sidebar-bg: #1a2238;
+            --sidebar-text: #b0b7c3;
+            --sidebar-active: #3a86ff;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: fixed;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 1.5rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
+            border-left: 4px solid var(--primary);
+        }
+
+        .sidebar-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Close button for sidebar on mobile */
+        .sidebar-close {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 0;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .page-title p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            position: relative;
+        }
+
+        .notification-icon i {
+            font-size: 1.3rem;
+            color: var(--gray);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .user-profile:hover {
+            background: var(--gray-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+            font-size: 1.1rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* User Dropdown Menu */
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            width: 220px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 20px;
+            width: 16px;
+            height: 16px;
+            background: var(--white);
+            transform: rotate(45deg);
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        .dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropdown-header .user-avatar {
+            width: 45px;
+            height: 45px;
+        }
+
+        .dropdown-header .user-info .user-name {
+            font-size: 1rem;
+        }
+
+        .dropdown-header .user-info .user-email {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-menu li {
+            margin: 0;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-menu a:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .dropdown-menu i {
+            margin-right: 10px;
+            width: 18px;
+            text-align: center;
+            color: var(--gray);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 0.5rem 0;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex: 1;
+        }
+
+        /* Earnings Stats */
+        .earnings-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .stat-info p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .bg-blue { background: var(--primary); }
+        .bg-green { background: var(--success); }
+        .bg-orange { background: #ff9e00; }
+        .bg-purple { background: var(--secondary); }
+
+        /* Earnings Chart */
+        .earnings-chart-container {
+            background: linear-gradient(135deg, var(--white) 0%, var(--primary-light) 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(58, 134, 255, 0.15);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(58, 134, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chart-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+            background: var(--white);
+            padding: 6px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-period-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .chart-period-btn.active, .chart-period-btn:hover {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+        }
+
+        .chart-period-btn.active {
+            pointer-events: none;
+        }
+
+        .chart-wrapper {
+            height: 320px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Decorative elements for chart */
+        .chart-decoration {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(58, 134, 255, 0.05) 0%, rgba(131, 56, 236, 0.05) 100%);
+            border-radius: 50%;
+            transform: translate(100px, -100px);
+            z-index: 1;
+        }
+
+        /* Search and Filter Bar */
+        .search-filter-bar {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .filter-dropdown {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2.5rem 0 1.5rem;
+        }
+
+        .section-header h2 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 8px;
+            background: var(--white);
+            padding: 6px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px var(--shadow);
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+        }
+
+        .filter-btn.active {
+            pointer-events: none;
+        }
+
+        /* Earnings Table */
+        .earnings-table-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .earnings-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .earnings-table thead {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .earnings-table th {
+            padding: 1.2rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--white);
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .earnings-table td {
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .earnings-table tbody tr:hover {
+            background: var(--light);
+        }
+
+        /* Payment method badges */
+        .payment-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-cash {
+            background: rgba(6, 214, 160, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(6, 214, 160, 0.3);
+        }
+
+        .badge-upi {
+            background: rgba(58, 134, 255, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(58, 134, 255, 0.3);
+        }
+
+        .badge-bank {
+            background: rgba(255, 209, 102, 0.15);
+            color: #e6a900;
+            border: 1px solid rgba(255, 209, 102, 0.3);
+        }
+
+        .badge-online {
+            background: rgba(131, 56, 236, 0.15);
+            color: var(--secondary);
+            border: 1px solid rgba(131, 56, 236, 0.3);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 134, 255, 0.3);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .pagination-btn.active, .pagination-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .pagination-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .pagination-link.active, .pagination-link:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        /* Footer Area */
+        .footer-area {
+            margin-top: auto;
+            padding-top: 2rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .earnings-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-close {
+                display: block;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .earnings-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .filter-options {
+                align-self: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .earnings-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-bar {
+                padding: 1rem;
+            }
+            
+            .dashboard-content {
+                padding: 1.5rem;
+            }
+            
+            .menu-toggle {
+                margin-right: 10px;
+            }
+            
+            .stat-card {
+                padding: 1.2rem;
+            }
+            
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .stat-info h3 {
+                font-size: 1.6rem;
+            }
+            
+            .search-filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .filter-dropdown {
+                width: 100%;
+            }
+            
+            .chart-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .filter-options {
+                flex-wrap: wrap;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .user-info {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 0.8rem;
+            }
+            
+            .page-title h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+            
+            .stat-info h3 {
+                font-size: 1.5rem;
+                margin-bottom: 2px;
+            }
+            
+            .stat-info p {
+                font-size: 0.8rem;
+            }
+            
+            .user-dropdown {
+                width: 200px;
+                right: -10px;
+            }
+            
+            .chart-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .chart-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Menu Toggle for Mobile */
+        .menu-toggle {
+            display: none;
+            background: var(--primary);
+            border: none;
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+        
+        /* Additional stats cards */
+        .additional-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .mini-stat-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 3px 10px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 3px solid;
+        }
+        
+        .mini-stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--white);
+        }
+        
+        .mini-stat-info h4 {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+            color: var(--dark);
+        }
+        
+        .mini-stat-info p {
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 768px) {
+            .additional-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .additional-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    {% include 'employee_html/employee_header.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle" onclick="openSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <h1>EARNINGS</h1>
+                <p>Track your income and payment history</p>
+            </div>
+
+            {% include 'employee_html/employee_dropdown.html' %}
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <div class="content-wrapper">
+                <!-- Additional Stats -->
+                <div class="additional-stats">
+                    <div class="mini-stat-card" style="border-left-color: var(--primary);">
+                        <div class="mini-stat-icon bg-blue">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="mini-stat-info">
+                            <h4>₹{{ today_earnings|floatformat:0 }}</h4>
+                            <p>Today's Earnings</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mini-stat-card" style="border-left-color: var(--success);">
+                        <div class="mini-stat-icon bg-green">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="mini-stat-info">
+                            <h4>₹{{ weekly_earnings|floatformat:0 }}</h4>
+                            <p>This Week</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mini-stat-card" style="border-left-color: var(--warning);">
+                        <div class="mini-stat-icon bg-orange">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="mini-stat-info">
+                            <h4>₹{{ monthly_earnings_total|floatformat:0 }}</h4>
+                            <p>This Month</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mini-stat-card" style="border-left-color: var(--secondary);">
+                        <div class="mini-stat-icon bg-purple">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="mini-stat-info">
+                            <h4>₹{{ avg_per_job|floatformat:0 }}</h4>
+                            <p>Avg/Job</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings Stats -->
+                <div class="earnings-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-blue">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>₹{{ total_earnings|floatformat:0 }}</h3>
+                            <p>Total Earnings Received</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon bg-green">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ total_jobs_completed }}</h3>
+                            <p>Total Jobs Completed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings Chart -->
+                <div class="earnings-chart-container">
+                    <div class="chart-decoration"></div>
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            {% if chart_period == 'daily' %}
+                                Daily Earnings Trend
+                            {% elif chart_period == 'weekly' %}
+                                Weekly Earnings Trend
+                            {% else %}
+                                Monthly Earnings Trend
+                            {% endif %}
+                        </div>
+                        <div class="chart-controls">
+                            <a href="?chart_period=daily{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                               class="chart-period-btn {% if chart_period == 'daily' %}active{% endif %}">
+                                Daily
+                            </a>
+                            <a href="?chart_period=weekly{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                               class="chart-period-btn {% if chart_period == 'weekly' %}active{% endif %}">
+                                Weekly
+                            </a>
+                            <a href="?chart_period=monthly{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                               class="chart-period-btn {% if chart_period == 'monthly' or not chart_period %}active{% endif %}">
+                                Monthly
+                            </a>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="earningsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Search and Filter Bar -->
+                <div class="search-filter-bar">
+                    <form method="GET" action="{% url 'employee_earnings' %}" id="searchForm">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" name="search" placeholder="Search earnings by job title or employer..." 
+                                   value="{{ search_query }}" id="searchInput">
+                        </div>
+                        <select class="filter-dropdown" name="payment_method" id="paymentMethodFilter">
+                            <option value="all" {% if payment_method_filter == 'all' %}selected{% endif %}>All Payment Methods</option>
+                            <option value="cash" {% if payment_method_filter == 'cash' %}selected{% endif %}>Cash</option>
+                            <option value="upi" {% if payment_method_filter == 'upi' %}selected{% endif %}>UPI</option>
+                            <option value="bank" {% if payment_method_filter == 'bank' %}selected{% endif %}>Bank Transfer</option>
+                            <option value="online" {% if payment_method_filter == 'online' %}selected{% endif %}>Online Payment</option>
+                        </select>
+                        <select class="filter-dropdown" name="date_filter" id="dateFilter">
+                            <option value="all" {% if date_filter == 'all' %}selected{% endif %}>All Time</option>
+                            <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
+                            <option value="week" {% if date_filter == 'week' %}selected{% endif %}>This Week</option>
+                            <option value="month" {% if date_filter == 'month' %}selected{% endif %}>This Month</option>
+                        </select>
+                        <input type="hidden" name="chart_period" value="{{ chart_period }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        {% if search_query or date_filter != 'all' or payment_method_filter != 'all' or chart_period != 'monthly' %}
+                        <a href="{% url 'employee_earnings' %}" class="btn" style="background: var(--light);">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <!-- Section Header -->
+                <div class="section-header">
+                    <h2>Payment History</h2>
+                    <div class="filter-options">
+                        <a href="?date_filter=all&chart_period={{ chart_period }}{% if search_query %}&search={{ search_query }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                           class="filter-btn {% if date_filter == 'all' or not date_filter %}active{% endif %}">All</a>
+                        <a href="?date_filter=today&chart_period={{ chart_period }}{% if search_query %}&search={{ search_query }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                           class="filter-btn {% if date_filter == 'today' %}active{% endif %}">Today</a>
+                        <a href="?date_filter=week&chart_period={{ chart_period }}{% if search_query %}&search={{ search_query }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                           class="filter-btn {% if date_filter == 'week' %}active{% endif %}">This Week</a>
+                        <a href="?date_filter=month&chart_period={{ chart_period }}{% if search_query %}&search={{ search_query }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                           class="filter-btn {% if date_filter == 'month' %}active{% endif %}">This Month</a>
+                    </div>
+                </div>
+
+                <!-- Earnings Table -->
+                <div class="earnings-table-container">
+                    <div class="table-responsive">
+                        <table class="earnings-table" id="earningsTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Job Title</th>
+                                    <th>Employer</th>
+                                    <th>Amount</th>
+                                    <th>Payment Method</th>
+                                </tr>
+                            </thead>
+                            <tbody id="earningsTableBody">
+                                {% if earnings_history %}
+                                {% for earning in earnings_history %}
+                                <tr>
+                                    <td style="font-weight: 500;">{{ earning.date }}</td>
+                                    <td>{{ earning.job_title }}</td>
+                                    <td style="font-weight: 500;">{{ earning.employer }}</td>
+                                    <td style="font-weight: 700; color: var(--success); font-size: 1.1rem;">
+                                        ₹{{ earning.amount|floatformat:0 }}
+                                    </td>
+                                    <td>
+                                        {% if earning.payment_method == 'cash' %}
+                                        <span class="payment-badge badge-cash">Cash</span>
+                                        {% elif earning.payment_method == 'upi' %}
+                                        <span class="payment-badge badge-upi">UPI</span>
+                                        {% elif earning.payment_method == 'bank' %}
+                                        <span class="payment-badge badge-bank">Bank Transfer</span>
+                                        {% elif earning.payment_method == 'online' %}
+                                        <span class="payment-badge badge-online">Online</span>
+                                        {% else %}
+                                        <span class="payment-badge badge-cash">{{ earning.payment_method|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-inbox"></i>
+                                            <h3>No earnings yet</h3>
+                                            <p>Complete jobs to see your earnings here</p>
+                                            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                                                <i class="fas fa-info-circle"></i> 
+                                                You have completed {{ total_jobs_completed }} jobs worth ₹{{ total_earnings|floatformat:0 }}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                {% if earnings_history.has_other_pages %}
+                <div class="pagination">
+                    {% if earnings_history.has_previous %}
+                    <a href="?page={{ earnings_history.previous_page_number }}&chart_period={{ chart_period }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                       class="pagination-link">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    {% endif %}
+                    
+                    {% for i in earnings_history.paginator.page_range %}
+                        {% if earnings_history.number == i %}
+                        <span class="pagination-link active">{{ i }}</span>
+                        {% elif i > earnings_history.number|add:'-3' and i < earnings_history.number|add:'3' %}
+                        <a href="?page={{ i }}&chart_period={{ chart_period }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                           class="pagination-link">{{ i }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if earnings_history.has_next %}
+                    <a href="?page={{ earnings_history.next_page_number }}&chart_period={{ chart_period }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}{% if payment_method_filter != 'all' %}&payment_method={{ payment_method_filter }}{% endif %}" 
+                       class="pagination-link">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize chart with actual data from Django
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChart();
+            
+            // Auto-submit form when filters change
+            document.getElementById('paymentMethodFilter').addEventListener('change', function() {
+                document.getElementById('searchForm').submit();
+            });
+            
+            document.getElementById('dateFilter').addEventListener('change', function() {
+                document.getElementById('searchForm').submit();
+            });
+            
+            // Debounced search
+            let searchTimeout;
+            document.getElementById('searchInput').addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    document.getElementById('searchForm').submit();
+                }, 500);
+            });
+        });
+
+        // Initialize chart with actual data from Django
+        function initializeChart() {
+            const ctx = document.getElementById('earningsChart').getContext('2d');
+            
+            // Use Django template variables passed from view
+            const labels = {{ chart_labels|safe }};
+            const chartData = {{ chart_data|safe }};
+            const period = "{{ chart_period }}";
+            
+            // Chart title based on period
+            let chartTitle = 'Monthly Earnings Trend';
+            if (period === 'daily') {
+                chartTitle = 'Daily Earnings Trend';
+            } else if (period === 'weekly') {
+                chartTitle = 'Weekly Earnings Trend';
+            }
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(58, 134, 255, 0.3)');
+            gradient.addColorStop(1, 'rgba(58, 134, 255, 0.05)');
+            
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Earnings (₹)',
+                        data: chartData,
+                        backgroundColor: gradient,
+                        borderColor: 'rgba(58, 134, 255, 1)',
+                        borderWidth: 4,
+                        pointBackgroundColor: 'rgba(255, 255, 255, 1)',
+                        pointBorderColor: 'rgba(58, 134, 255, 1)',
+                        pointBorderWidth: 3,
+                        pointRadius: 8,
+                        pointHoverRadius: 10,
+                        fill: true,
+                        tension: 0.4,
+                        pointHoverBackgroundColor: 'rgba(58, 134, 255, 1)',
+                        pointHoverBorderColor: 'rgba(255, 255, 255, 1)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: 'rgba(0, 0, 0, 0.7)',
+                                font: {
+                                    size: 13,
+                                    weight: '500'
+                                },
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: chartTitle,
+                            font: {
+                                size: 16,
+                                weight: '600'
+                            },
+                            color: 'rgba(0, 0, 0, 0.8)',
+                            padding: {
+                                bottom: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: 'rgba(0, 0, 0, 0.9)',
+                            bodyColor: 'rgba(0, 0, 0, 0.7)',
+                            borderColor: 'rgba(58, 134, 255, 0.2)',
+                            borderWidth: 1,
+                            padding: 12,
+                            boxPadding: 6,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return `₹${context.parsed.y.toLocaleString('en-IN')}`;
+                                },
+                                labelColor: function(context) {
+                                    return {
+                                        borderColor: 'rgba(58, 134, 255, 1)',
+                                        backgroundColor: 'rgba(58, 134, 255, 1)',
+                                        borderWidth: 3,
+                                        borderRadius: 2
+                                    };
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: 'rgba(0, 0, 0, 0.6)',
+                                font: {
+                                    size: 12
+                                },
+                                padding: 10,
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            },
+                            border: {
+                                display: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: 'rgba(0, 0, 0, 0.6)',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                padding: 10
+                            },
+                            border: {
+                                display: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.4
+                        }
+                    }
+                }
+            });
+        }
+
+        // Modal and sidebar functions
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+        
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+        
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('active');
+        }
+        
+        // Close sidebar when clicking on overlay
+        document.getElementById('overlay').addEventListener('click', function() {
+            closeSidebar();
+            this.classList.remove('active');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const profile = document.getElementById('userProfile');
+            
+            if (dropdown && profile && !profile.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

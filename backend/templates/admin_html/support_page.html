@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillConnect | Admin Support</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-bg: #1e293b;
+            --sidebar-dark: #0f172a;
+            --sidebar-light: #334155;
+            --sidebar-text: #e2e8f0;
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+            --sidebar-border: #475569;
+
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --warning-color: #f97316;
+            --success-color: #10b981;
+            --info-color: #06b6d4;
+
+            --card-bg: #ffffff;
+            --body-bg: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 24px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            padding-top: 24px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-title p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            font-size: 1.2rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            background-color: #f1f5f9;
+            transition: background-color 0.2s ease;
+        }
+
+        .admin-profile:hover {
+            background-color: #e2e8f0;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .support-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            background-color: var(--primary-color);
+        }
+
+        .card-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            transition: background-color 0.2s ease;
+        }
+
+        .contact-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .contact-details h4 {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .contact-details p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .contact-details a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .contact-details a:hover {
+            text-decoration: underline;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background-color: white;
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .select-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: #f8fafc;
+            cursor: pointer;
+        }
+
+        .select-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background-color: white;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            accent-color: var(--primary-color);
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .priority-medium {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--accent-color);
+        }
+
+        .priority-low {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .alert-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+        }
+
+        .message-history {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .message-history h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message-item {
+            padding: 16px;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .message-subject {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .message-type {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+        }
+
+        .message-preview {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .message-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .no-messages {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .no-messages i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 1200px) {
+            .support-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+                padding-top: calc(var(--header-height) + 20px);
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 20px;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .contact-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .contact-details {
+                text-align: center;
+            }
+
+            .message-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .message-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 16px;
+                padding-top: calc(var(--header-height) + 16px);
+            }
+
+            .page-header {
+                padding: 16px;
+            }
+
+            .header-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .header-title p {
+                font-size: 0.9rem;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .card-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .card-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'admin_html/admin_sidebar.html' %}
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-title">
+                <h1>Developer Support</h1>
+                <p>Contact the development team for technical issues and platform support</p>
+            </div>
+            <div class="header-actions">
+                {% include 'admin_html/includes/admin_notification.html' %}
+                <div class="admin-profile">
+                    <div class="admin-avatar">{{ request.user.username|default:"A"|first|upper }}</div>
+                    <div>
+                        <h4 style="margin-bottom: 2px;">{{ request.user.username|default:"Administrator" }}</h4>
+                        <p style="color: var(--text-light); font-size: 0.85rem;">{{ request.user.email|default:"admin@skillconnect.com" }}</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Display Django messages -->
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'success' %}success{% else %}error{% endif %}">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Support Container -->
+        <div class="support-container">
+            <!-- Contact Information Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h2>Contact Developer</h2>
+                </div>
+
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Development Team</h4>
+                            <p>{{ developer_info.name }}</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Email Address</h4>
+                            <p>
+                                <a href="mailto:{{ developer_info.email }}">
+                                    <i class="fas fa-envelope"></i> {{ developer_info.email }}
+                                </a>
+                            </p>
+                            <p>
+                                <a href="mailto:{{ developer_info.support_email }}">
+                                    <i class="fas fa-life-ring"></i> {{ developer_info.support_email }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Phone Number</h4>
+                            <p>
+                                <a href="tel:{{ developer_info.phone }}">
+                                    <i class="fas fa-phone"></i> {{ developer_info.phone }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Office Address</h4>
+                            <p>{{ developer_info.address }}</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Working Hours</h4>
+                            <p>{{ developer_info.working_hours }}</p>
+                            <p><small>Response time: {{ developer_info.response_time }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Form Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h2>Send Support Request</h2>
+                </div>
+
+                <form method="POST" action="{% url 'send_support_message' %}">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="issue_type">Issue Type</label>
+                        <select class="select-control" id="issue_type" name="issue_type" required>
+                            <option value="General">General Inquiry</option>
+                            <option value="Bug">Bug Report</option>
+                            <option value="Feature">Feature Request</option>
+                            <option value="Security">Security Concern</option>
+                            <option value="Performance">Performance Issue</option>
+                            <option value="Database">Database Problem</option>
+                            <option value="API">API Integration</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Priority Level</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="priority" value="Low" checked>
+                                <span class="priority-badge priority-low">Low Priority</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="priority" value="Medium">
+                                <span class="priority-badge priority-medium">Medium Priority</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="priority" value="High">
+                                <span class="priority-badge priority-high">High Priority</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject"
+                            placeholder="Brief description of your issue" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Detailed Description</label>
+                        <textarea class="form-control" id="message" name="message"
+                            placeholder="Please provide detailed information about the issue you're facing. Include steps to reproduce if applicable."
+                            required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Send Message to Developer
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Message History --
+        <div class="message-history">
+            <h2><i class="fas fa-history"></i> Recent Support Requests</h2>
+            
+            <div class="message-list">
+                 This would typically come from your database -
+                -- For now, showing static examples -
+                
+                <div class="message-item">
+                    <div class="message-header">
+                        <div class="message-subject">Database Connection Timeout</div>
+                        <span class="message-type">Performance Issue</span>
+                    </div>
+                    <div class="message-preview">
+                        Users experiencing connection timeouts during peak hours. Need to optimize database queries...
+                    </div>
+                    <div class="message-footer">
+                        <span>Sent on: 2024-01-15 14:30</span>
+                        <span>Status: <strong style="color: var(--success-color);">Resolved</strong></span>
+                    </div>
+                </div>
+                
+                <div class="message-item">
+                    <div class="message-header">
+                        <div class="message-subject">Add New Payment Gateway</div>
+                        <span class="message-type">Feature Request</span>
+                    </div>
+                    <div class="message-preview">
+                        Request to integrate Razorpay payment gateway for smoother transactions...
+                    </div>
+                    <div class="message-footer">
+                        <span>Sent on: 2024-01-10 10:15</span>
+                        <span>Status: <strong style="color: var(--accent-color);">In Progress</strong></span>
+                    </div>
+                </div>
+                
+                <div class="message-item">
+                    <div class="message-header">
+                        <div class="message-subject">Admin Panel UI Enhancement</div>
+                        <span class="message-type">General</span>
+                    </div>
+                    <div class="message-preview">
+                        Suggestions for improving the admin dashboard UI for better user experience...
+                    </div>
+                    <div class="message-footer">
+                        <span>Sent on: 2024-01-05 16:45</span>
+                        <span>Status: <strong style="color: var(--primary-color);">Reviewing</strong></span>
+                    </div>
+                </div>
+                
+                If no messages exist 
+                
+                <div class="no-messages">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No support requests yet</h3>
+                    <p>Your support requests will appear here once you send them.</p>
+                </div>
+                
+            </div>
+        </div> -->
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            // Toggle sidebar on mobile
+            if (menuToggle && sidebar && sidebarOverlay) {
+                menuToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                    sidebarOverlay.classList.toggle('active');
+                    document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+                });
+
+                // Close sidebar when clicking on overlay
+                sidebarOverlay.addEventListener('click', function () {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+
+            // Form submission feedback
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function () {
+                    const submitBtn = form.querySelector('.submit-btn');
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                        submitBtn.disabled = true;
+                    }
+                });
+            }
+
+            // Auto-hide alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.parentNode.removeChild(alert);
+                        }
+                    }, 500);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Messages - WorkNest{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            min-height: 100vh;
+        }
+        
+        {% if user_info.type == 'employee' %}
+        /* Employee specific: Body already has flex layout from employee_header */
+        .messaging-content-wrapper {
+            flex: 1;
+            margin-left: 260px;
+            min-height: 100vh;
+            background: #f5f7fb;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @media (max-width: 992px) {
+            .messaging-content-wrapper {
+                margin-left: 0 !important;
+            }
+        }
+        {% else %}
+        /* Employer specific: Body has display: flex from employer_header */
+        .messaging-content-wrapper {
+            flex: 1;
+            margin-left: 260px;
+            min-height: 100vh;
+            background: #f5f7fb;
+            position: relative;
+            z-index: 1;
+        }
+        {% endif %}
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user_info.type == 'employer' %}
+        {% include 'employer_html/employer_header.html' %}
+    {% elif user_info.type == 'employee' %}
+        {% include 'employee_html/employee_header.html' %}
+    {% endif %}
+    
+    <div class="messaging-content-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,265 @@
+<div class="modal-header">
+    <h3 class="modal-title">
+        <i class="fas fa-brain" style="color: var(--primary-color); margin-right: 10px;"></i>
+        {{ model.model_name }}
+    </h3>
+    <button type="button" class="close-modal-btn" onclick="closeModal('modelDetailsModal')">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="model-meta-grid">
+        <div class="meta-item">
+            <span class="meta-label">Type</span>
+            <span class="meta-value">{{ model.get_model_type_display }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Version</span>
+            <span class="meta-value">{{ model.version }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Status</span>
+            <span class="model-status-badge {{ model.status_display.class }}">
+                {{ model.get_status_display }}
+            </span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Uploaded By</span>
+            <span class="meta-value">{{ uploader_name }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Uploaded On</span>
+            <span class="meta-value">{{ uploaded_at_formatted }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Deployed On</span>
+            <span class="meta-value">{{ deployed_at_formatted }}</span>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="details-section">
+        <h4>Description</h4>
+        <p class="description-text">{{ model.description|default:"No description provided." }}</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="details-section">
+        <h4>Model Configuration</h4>
+        <div class="config-grid">
+            <div class="config-item">
+                <span class="config-key">Algorithm:</span>
+                <span class="config-value">{{ model.algorithm }}</span>
+            </div>
+            <div class="config-item">
+                <span class="config-key">n_estimators:</span>
+                <span class="config-value">{{ model.n_estimators }}</span>
+            </div>
+            <div class="config-item">
+                <span class="config-key">max_depth:</span>
+                <span class="config-value">{{ model.max_depth }}</span>
+            </div>
+            <div class="config-item">
+                <span class="config-key">learning_rate:</span>
+                <span class="config-value">{{ model.learning_rate }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if performance_metrics %}
+    <div class="section-divider"></div>
+
+    <div class="details-section">
+        <h4>Performance Metrics</h4>
+        <table class="metrics-table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Split</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for metric in performance_metrics %}
+                <tr>
+                    <td>{{ metric.metric_name }}</td>
+                    <td><span class="badge-split">{{ metric.split_type }}</span></td>
+                    <td class="font-mono">{{ metric.value|floatformat:4 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+<div class="modal-footer">
+    <a href="{% url 'download_model_file' model.model_id %}" class="btn btn-secondary">
+        <i class="fas fa-download"></i> Download File ({{ file_size_mb }} MB)
+    </a>
+    {% if model.status == 'pending' %}
+    <form method="post" action="{% url 'update_model_status' model.model_id %}" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="approve">
+        <button type="submit" class="btn btn-success">Approve</button>
+    </form>
+    {% endif %}
+</div>
+
+<style>
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .close-modal-btn {
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: #64748b;
+        cursor: pointer;
+        transition: color 0.2s;
+        padding: 4px;
+    }
+
+    .close-modal-btn:hover {
+        color: #ef4444;
+    }
+
+    .modal-body {
+        padding: 24px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .model-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .meta-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .meta-value {
+        font-size: 0.95rem;
+        color: #0f172a;
+        font-weight: 500;
+    }
+
+    .section-divider {
+        height: 1px;
+        background-color: #e2e8f0;
+        margin: 24px 0;
+    }
+
+    .details-section h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 12px;
+    }
+
+    .description-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #475569;
+    }
+
+    .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        background-color: #f8fafc;
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .config-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+    }
+
+    .config-key {
+        color: #64748b;
+    }
+
+    .config-value {
+        font-family: 'Monaco', 'Consolas', monospace;
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .metrics-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .metrics-table th {
+        text-align: left;
+        padding: 8px 12px;
+        background-color: #f1f5f9;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    .metrics-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #1e293b;
+    }
+
+    .badge-split {
+        background-color: #e0e7ff;
+        color: #4338ca;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .font-mono {
+        font-family: 'Monaco', 'Consolas', monospace;
+    }
+
+    .modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+        border-radius: 0 0 12px 12px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+</style>

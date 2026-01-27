@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - WorkNest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #3a86ff;
+            --primary-light: #e6f0ff;
+            --primary-dark: #1a5fd8;
+            --secondary: #8338ec;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+            --card-bg: #ffffff;
+            --sidebar-bg: #1a2238;
+            --sidebar-text: #b0b7c3;
+            --sidebar-active: #3a86ff;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 0;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .page-title p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex: 1;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0 1.5rem;
+        }
+
+        .section-header h2 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Notifications List */
+        .notifications-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .notification-card {
+            display: flex;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s;
+            position: relative;
+            gap: 20px;
+            border-radius: 8px;
+        }
+
+        .notification-card:last-child {
+            border-bottom: none;
+        }
+
+        .notification-card:hover {
+            background: var(--light);
+        }
+
+        .notification-card.unread {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification-icon-large {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.5rem;
+        }
+
+        .notification-details {
+            flex: 1;
+        }
+
+        .notification-header-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+
+        .notification-meta {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-description {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .notification-actions-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-light);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--gray-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .bg-blue-light {
+            background: rgba(58, 134, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .bg-green-light {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--success);
+        }
+
+        .bg-red-light {
+            background: rgba(239, 71, 111, 0.1);
+            color: var(--danger);
+        }
+
+        .bg-orange-light {
+            background: rgba(255, 209, 102, 0.1);
+            color: var(--warning);
+        }
+
+        .bg-purple-light {
+            background: rgba(131, 56, 236, 0.1);
+            color: var(--secondary);
+        }
+
+        .bg-gray-light-icon {
+            background: var(--gray-light);
+            color: var(--gray);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .notification-card {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .notification-header-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .top-bar {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'employee_html/employee_header.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="page-title">
+                <h1>NOTIFICATIONS</h1>
+                <p>Stay updated with your job requests and alerts</p>
+            </div>
+            {% include 'employee_html/employee_dropdown.html' %}
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <div class="content-wrapper">
+
+                <div class="section-header">
+                    <h2>All Notifications</h2>
+                    {% if unread_notifications_count > 0 %}
+                    <form method="POST" action="{% url 'mark_all_notifications_read' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline">
+                            <i class="fas fa-check-double"></i> Mark All as Read
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <div class="notifications-container">
+                    {% if all_notifications %}
+                    {% for notification in all_notifications %}
+                    <div class="notification-card {% if not notification.is_read %}unread{% endif %}">
+                        <div class="notification-icon-large 
+                                {% if notification.notification_type == 'job_request' %}bg-blue-light
+                                {% elif notification.notification_type == 'job_accepted' %}bg-green-light
+                                {% elif notification.notification_type == 'job_rejected' %}bg-red-light
+                                {% elif notification.notification_type == 'job_completed' %}bg-orange-light
+                                {% elif notification.notification_type == 'payment_received' %}bg-purple-light
+                                {% else %}bg-gray-light-icon{% endif %}">
+
+                            {% if notification.notification_type == 'job_request' %}<i class="fas fa-briefcase"></i>
+                            {% elif notification.notification_type == 'job_accepted' %}<i
+                                class="fas fa-check-circle"></i>
+                            {% elif notification.notification_type == 'job_rejected' %}<i
+                                class="fas fa-times-circle"></i>
+                            {% elif notification.notification_type == 'job_completed' %}<i
+                                class="fas fa-check-double"></i>
+                            {% elif notification.notification_type == 'payment_received' %}<i
+                                class="fas fa-rupee-sign"></i>
+                            {% elif notification.notification_type == 'review_received' %}<i class="fas fa-star"></i>
+                            {% else %}<i class="fas fa-bell"></i>{% endif %}
+                        </div>
+
+                        <div class="notification-details">
+                            <div class="notification-header-row">
+                                <h3 class="notification-title">{{ notification.title }}</h3>
+                                <div class="notification-meta">
+                                    <i class="far fa-clock"></i> {{ notification.created_at|timesince }} ago
+                                </div>
+                            </div>
+                            <p class="notification-description">{{ notification.message }}</p>
+
+                            <div class="notification-actions-row">
+                                {% if notification.link %}
+                                <a href="{{ notification.link }}" class="btn btn-primary">
+                                    View Details
+                                </a>
+                                {% endif %}
+
+                                {% if not notification.is_read %}
+                                <form method="POST"
+                                    action="{% url 'mark_notification_read' notification.notification_id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline">
+                                        Mark Read
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>No Notifications</h3>
+                        <p>You're all caught up! When you receive new notifications, they will appear here.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

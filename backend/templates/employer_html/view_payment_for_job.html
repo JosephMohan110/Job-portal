@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Details - WorkNest</title>
+    <style>
+        .payment-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #4a6fff;
+        }
+
+        .payment-header h1 {
+            color: #4a6fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .payment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .amount-display {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #4a6fff, #3a5fef);
+            border-radius: 12px;
+            margin: 2rem 0;
+            color: white;
+        }
+
+        .amount-label {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .amount {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 0.5rem 0;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-paid { background: #d4edda; color: #155724; }
+        .status-failed { background: #f8d7da; color: #721c24; }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #4a6fff;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .payment-history {
+            margin-top: 2rem;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .history-table th {
+            background: #4a6fff;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .history-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .history-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .no-payment {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    {% include 'employer_html/employer_header.html' %}
+
+    <main class="main-content">
+        <div class="payment-detail-container">
+            <!-- Header -->
+            <div class="payment-header">
+                <h1><i class="fas fa-file-invoice-dollar"></i> Payment Details</h1>
+                <p>Job #{{ job.job_id }} - {{ job.title }}</p>
+            </div>
+
+            <!-- Job Info Card -->
+            <div class="payment-card">
+                <h3 style="color: #4a6fff; margin-bottom: 1.5rem;">
+                    <i class="fas fa-briefcase"></i> Job Information
+                </h3>
+                
+                <div class="payment-grid">
+                    <div class="info-item">
+                        <div class="info-label">Job Title</div>
+                        <div class="info-value">{{ job.title }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Worker</div>
+                        <div class="info-value">{{ job.employee.full_name }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Job Status</div>
+                        <div class="info-value">{{ job.get_status_display }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Completed Date</div>
+                        <div class="info-value">{{ job.completed_at|date:"d M Y"|default:"Not completed" }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Job Budget</div>
+                        <div class="info-value">₹{{ job.budget|floatformat:0 }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Location</div>
+                        <div class="info-value">{{ job.location }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Status Card -->
+            <div class="payment-card">
+                <h3 style="color: #4a6fff; margin-bottom: 1.5rem;">
+                    <i class="fas fa-credit-card"></i> Payment Status
+                </h3>
+                
+                <!-- Amount Display -->
+                <div class="amount-display">
+                    <div class="amount-label">Amount to Pay</div>
+                    <div class="amount">₹{{ payment_amount|floatformat:0 }}</div>
+                    <div class="status-badge status-{{ payment_status|lower }}">
+                        {{ payment_status }}
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    {% if is_eligible_for_payment and not latest_payment %}
+                    <a href="{% url 'initiate_payment' job.job_id %}" class="btn btn-success">
+                        <i class="fas fa-credit-card"></i> Make Payment
+                    </a>
+                    {% endif %}
+                    
+                    {% if latest_payment %}
+                    <a href="{% url 'transaction_details' latest_payment.payment_id %}" class="btn btn-primary">
+                        <i class="fas fa-receipt"></i> View Transaction
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'employer_payment_section' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Payments
+                    </a>
+                </div>
+            </div>
+
+            <!-- Payment History -->
+            {% if existing_payments %}
+            <div class="payment-card payment-history">
+                <h3 style="color: #4a6fff; margin-bottom: 1.5rem;">
+                    <i class="fas fa-history"></i> Payment History
+                </h3>
+                
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Payment ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in existing_payments %}
+                        <tr>
+                            <td>{{ payment.created_at|date:"d M Y" }}</td>
+                            <td>#{{ payment.payment_id }}</td>
+                            <td>₹{{ payment.amount|floatformat:0 }}</td>
+                            <td>
+                                <span class="status-badge status-{{ payment.status }}">
+                                    {{ payment.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'transaction_details' payment.payment_id %}" 
+                                   class="btn" style="padding: 6px 12px; font-size: 0.9rem;">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="payment-card">
+                <div class="no-payment">
+                    <i class="fas fa-credit-card" style="font-size: 3rem; color: #dee2e6; margin-bottom: 1rem;"></i>
+                    <h3>No Payment History</h3>
+                    <p>No payments have been made for this job yet.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

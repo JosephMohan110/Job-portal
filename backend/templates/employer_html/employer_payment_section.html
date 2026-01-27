@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Section - WorkNest</title>
+    <style>
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .page-header h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+
+        /* Payment Stats Cards */
+        .payment-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .payment-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .payment-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 20px var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+        }
+
+        .stat-card.total-paid::before {
+            background: var(--primary);
+        }
+
+        .stat-card.pending::before {
+            background: var(--warning);
+        }
+
+        .stat-card.successful::before {
+            background: var(--success);
+        }
+
+        .stat-card.monthly::before {
+            background: var(--info);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px var(--shadow-lg);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        .icon-blue { background: var(--primary); }
+        .icon-orange { background: var(--warning); }
+        .icon-green { background: var(--success); }
+        .icon-cyan { background: var(--info); }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h2 {
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 5px 15px var(--shadow);
+            text-decoration: none;
+            background: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Tables */
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .payment-table th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .payment-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .payment-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .payment-table tr:hover {
+            background: var(--primary-light);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-processing { background: #d1ecf1; color: #0c5460; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-failed { background: #f8d7da; color: #721c24; }
+        .status-refunded { background: #e2e3e5; color: #383d41; }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-pay {
+            background: var(--success);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-view {
+            background: var(--info);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-invoice {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-refund {
+            background: var(--warning);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 20px var(--shadow);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--primary-light);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Responsive Table */
+        @media (max-width: 768px) {
+            .payment-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-sm {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 20px var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .action-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .action-card h3 {
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .action-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    {% include 'employer_html/employer_header.html' %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-wallet"></i> Payment & Transactions</h1>
+            <p>Manage payments, view transaction history, and download invoices</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="{% url 'payment_history' %}" class="action-card">
+                <i class="fas fa-history"></i>
+                <h3>Payment History</h3>
+                <p>View all your past payments and transactions</p>
+            </a>
+            
+            <a href="{% url 'employer_hiring_history' %}" class="action-card">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h3>Pending Payments</h3>
+                <p>View jobs waiting for payment completion</p>
+            </a>
+            
+            <a href="#" class="action-card" id="quickPayBtn">
+                <i class="fas fa-bolt"></i>
+                <h3>Quick Pay</h3>
+                <p>Make instant payment to any worker</p>
+            </a>
+            
+            <a href="#" class="action-card">
+                <i class="fas fa-download"></i>
+                <h3>Download Reports</h3>
+                <p>Export payment reports in PDF/Excel</p>
+            </a>
+        </div>
+
+        <!-- Payment Statistics -->
+        <div class="section-header">
+            <h2>Payment Overview</h2>
+        </div>
+        
+        <div class="payment-stats">
+            <div class="stat-card total-paid">
+                <div class="stat-icon icon-blue">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <h3>₹{{ stats.total_paid|floatformat:0 }}</h3>
+                <p>Total Amount Paid</p>
+            </div>
+            
+            <div class="stat-card pending">
+                <div class="stat-icon icon-orange">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>₹{{ stats.pending_amount|floatformat:0 }}</h3>
+                <p>Pending Payments</p>
+            </div>
+            
+            <div class="stat-card successful">
+                <div class="stat-icon icon-green">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>{{ stats.successful_payments }}</h3>
+                <p>Successful Payments</p>
+            </div>
+            
+            <div class="stat-card monthly">
+                <div class="stat-icon icon-cyan">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>₹{{ stats.monthly_spending|floatformat:0 }}</h3>
+                <p>This Month's Spending</p>
+            </div>
+        </div>
+
+        <!-- Pending Payments -->
+        <div class="section-header">
+            <h2>Pending Payments</h2>
+            <a href="{% url 'employer_hiring_history' %}" class="btn btn-primary">
+                <i class="fas fa-eye"></i> View All
+            </a>
+        </div>
+        
+        {% if pending_payments %}
+        <table class="payment-table">
+            <thead>
+                <tr>
+                    <th>Job Title</th>
+                    <th>Worker</th>
+                    <th>Amount</th>
+                    <th>Completed Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in pending_payments %}
+                <tr>
+                    <td>{{ job.title }}</td>
+                    <td>{{ job.employee.full_name }}</td>
+                    <td>₹{{ job.budget|floatformat:0 }}</td>
+                    <td>{{ job.completed_at|date:"d M Y"|default:"-" }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'initiate_payment' job.job_id %}" class="btn-sm btn-pay">
+                                <i class="fas fa-credit-card"></i> Pay Now
+                            </a>
+                             <a href="{% url 'view_payment_for_job' job.job_id %}" class="btn-sm btn-view">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-check-circle"></i>
+            <h3>No Pending Payments</h3>
+            <p>All your completed jobs have been paid</p>
+        </div>
+        {% endif %}
+
+        <!-- Recent Payments -->
+        <div class="section-header">
+            <h2>Recent Payments</h2>
+            <a href="{% url 'payment_history' %}" class="btn btn-primary">
+                <i class="fas fa-history"></i> Full History
+            </a>
+        </div>
+        
+        {% if recent_payments %}
+        <table class="payment-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Worker</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in recent_payments %}
+                <tr>
+                    <td>{{ payment.created_at|date:"d M Y" }}</td>
+                    <td>{{ payment.employee.full_name }}</td>
+                    <td>₹{{ payment.amount|floatformat:0 }}</td>
+                    <td>
+                        <span class="status-badge status-{{ payment.status }}">
+                            {{ payment.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'transaction_details' payment.payment_id %}" class="btn-sm btn-view">
+                                <i class="fas fa-receipt"></i> Details
+                            </a>
+                            {% if payment.status == 'completed' %}
+                            <a href="{% url 'view_invoice' payment.payment_id %}" class="btn-sm btn-invoice">
+                                <i class="fas fa-file-invoice"></i> Invoice
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-credit-card"></i>
+            <h3>No Payments Yet</h3>
+            <p>Your payment history will appear here</p>
+            <a href="{% url 'employer_find_workers' %}" class="btn btn-primary">
+                <i class="fas fa-search"></i> Find Workers to Hire
+            </a>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Quick Pay Modal (Inline for Django) -->
+    <div id="quickPayModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Quick Payment</h3>
+                <button type="button" class="close-modal" onclick="closeQuickPayModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'quick_payment' 0 %}" id="quickPayForm">
+                    {% csrf_token %}
+                    <div style="margin-bottom: 1rem;">
+                        <label>Select Worker</label>
+                        <select name="employee_id" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <option value="">Select a worker</option>
+                            {% for job in pending_payments %}
+                            <option value="{{ job.employee.employee_id }}">{{ job.employee.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label>Amount (₹)</label>
+                        <input type="number" name="amount" step="0.01" min="1" required 
+                               style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label>Description</label>
+                        <textarea name="description" rows="3" 
+                                  style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-credit-card"></i> Proceed to Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quick Pay Modal
+        document.getElementById('quickPayBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('quickPayModal').style.display = 'flex';
+        });
+        
+        function closeQuickPayModal() {
+            document.getElementById('quickPayModal').style.display = 'none';
+        }
+        
+        // Update form action with selected employee ID
+        document.querySelector('select[name="employee_id"]').addEventListener('change', function() {
+            const employeeId = this.value;
+            const form = document.getElementById('quickPayForm');
+            form.action = "{% url 'quick_payment' 0 %}".replace('0', employeeId);
+        });
+    </script>
+</body>
+</html>

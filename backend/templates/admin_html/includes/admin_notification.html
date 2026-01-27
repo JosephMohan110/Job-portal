@@ -1,0 +1,380 @@
+<style>
+    /* Notification Styles */
+    .notification-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .notification-btn {
+        position: relative;
+        background: white;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        color: #64748b;
+        font-size: 1.2rem;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .notification-btn:hover,
+    .notification-btn.active {
+        background-color: #f1f5f9;
+        color: #3b82f6;
+        border-color: #cbd5e1;
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: #ef4444;
+        color: white;
+        border-radius: 50%;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border: 2px solid white;
+        box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+    }
+
+    .notification-dropdown {
+        position: absolute;
+        top: calc(100% + 15px);
+        right: -10px;
+        width: 380px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        border: 1px solid #e2e8f0;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .notification-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .notification-dropdown::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        right: 20px;
+        width: 12px;
+        height: 12px;
+        background: white;
+        transform: rotate(45deg);
+        border-top: 1px solid #e2e8f0;
+        border-left: 1px solid #e2e8f0;
+    }
+
+    .dropdown-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .dropdown-header h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .mark-read {
+        font-size: 0.8rem;
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .mark-read:hover {
+        background-color: #eff6ff;
+    }
+
+    .notification-list {
+        max-height: 350px;
+        overflow-y: auto;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+
+    .notification-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .notification-list::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .notification-item {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        position: relative;
+    }
+
+    .notification-item:hover {
+        background-color: #f8fafc;
+    }
+
+    .notification-item.unread {
+        background-color: #eff6ff;
+    }
+
+    .notification-item.unread:hover {
+        background-color: #e0f2fe;
+    }
+
+    .notification-item.unread::after {
+        content: '';
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 8px;
+        height: 8px;
+        background-color: #3b82f6;
+        border-radius: 50%;
+    }
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+    .notif-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1rem;
+    }
+
+    .icon-info {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+
+    .icon-success {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .icon-warning {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .icon-danger {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .notif-content {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .notif-content h4 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 4px 0;
+        line-height: 1.4;
+    }
+
+    .notif-content p {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0 0 6px 0;
+        line-height: 1.5;
+    }
+
+    .notif-time {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 500;
+    }
+
+    .dropdown-footer {
+        padding: 12px;
+        text-align: center;
+        border-top: 1px solid #f1f5f9;
+        background-color: #f8fafc;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .view-all {
+        font-size: 0.9rem;
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 600;
+        display: block;
+        padding: 4px;
+    }
+
+    .view-all:hover {
+        text-decoration: underline;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #cbd5e1;
+        margin-bottom: 16px;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 576px) {
+        .notification-dropdown {
+            width: 300px;
+            right: -80px;
+        }
+
+        .notification-dropdown::before {
+            right: 90px;
+        }
+    }
+</style>
+
+<div class="notification-wrapper">
+    <button class="notification-btn" id="adminNotificationBtn" onclick="toggleAdminNotifications(event)">
+        <i class="fas fa-bell"></i>
+        <!-- Show badge only if count > 0 -->
+        <span class="notification-badge" id="adminNotificationBadge" style="display: none;">0</span>
+    </button>
+
+    <div class="notification-dropdown" id="adminNotificationDropdown" onclick="event.stopPropagation()">
+        <div class="dropdown-header">
+            <h3><i class="fas fa-bell" style="color: #3b82f6;"></i> Notifications</h3>
+            <span class="mark-read" onclick="markAllAdminNotificationsRead()">Mark all read</span>
+        </div>
+
+        <ul class="notification-list" id="adminNotificationList">
+            <!-- Content will be injected by JS or fallback to server-side rendering -->
+
+            {% if admin_notifications %}
+            {% for n in admin_notifications %}
+            <li class="notification-item {% if not n.is_read %}unread{% endif %}">
+                <div class="notif-icon icon-{{ n.type|default:'info' }}">
+                    <i class="fas fa-{{ n.icon|default:'info-circle' }}"></i>
+                </div>
+                <div class="notif-content">
+                    <h4>{{ n.title }}</h4>
+                    <p>{{ n.message }}</p>
+                    <span class="notif-time"><i class="far fa-clock"></i> {{ n.created_at|timesince }} ago</span>
+                </div>
+            </li>
+            {% endfor %}
+            {% else %}
+            <!-- Empty State (Default if no context variable) -->
+            <li class="empty-state">
+                <i class="far fa-bell-slash"></i>
+                <p>No new notifications at the moment.</p>
+            </li>
+            {% endif %}
+        </ul>
+
+        <div class="dropdown-footer">
+            <a href="#" class="view-all">View All Activity</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleAdminNotifications(event) {
+        event.stopPropagation();
+        const dropdown = document.getElementById('adminNotificationDropdown');
+        const btn = document.getElementById('adminNotificationBtn');
+
+        dropdown.classList.toggle('active');
+        btn.classList.toggle('active');
+
+        // Close other dropdowns if any
+        document.querySelectorAll('.dropdown-menu').forEach(el => {
+            if (el !== dropdown) el.classList.remove('active');
+        });
+    }
+
+    function markAllAdminNotificationsRead() {
+        // Visual update only since backend isn't connected yet
+        const items = document.querySelectorAll('.notification-item.unread');
+        items.forEach(item => {
+            item.classList.remove('unread');
+        });
+
+        const badge = document.getElementById('adminNotificationBadge');
+        if (badge) badge.style.display = 'none';
+
+        // Optional: Call backend API here
+        // fetch('/api/admin/notifications/mark-all-read/', { method: 'POST' });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (event) {
+        const dropdown = document.getElementById('adminNotificationDropdown');
+        const btn = document.getElementById('adminNotificationBtn');
+
+        if (dropdown && dropdown.classList.contains('active') && !dropdown.contains(event.target) && !btn.contains(event.target)) {
+            dropdown.classList.remove('active');
+            btn.classList.remove('active');
+        }
+    });
+
+    // Mock data for demonstration if no backend data
+    /*
+    document.addEventListener('DOMContentLoaded', function() {
+        const badge = document.getElementById('adminNotificationBadge');
+        // Uncomment to show badge for testing
+        // if(badge) { badge.style.display = 'flex'; badge.innerText = '3'; }
+    });
+    */
+</script>

@@ -1,0 +1,764 @@
+{% load static %}
+<!-- Enhanced Voice Assistant Widget -->
+<div id="voice-assistant-widget">
+    <!-- Microphone Button -->
+    <button id="voice-mic" class="voice-mic-btn" title="Click to speak commands">
+        <span class="mic-icon">🎤</span>
+        <span class="mic-label">Voice Assistant</span>
+    </button>
+
+    <!-- Status Display -->
+    <div id="voice-status" class="voice-status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Ready to help</span>
+    </div>
+
+    <!-- Commands Help -->
+    <div id="commands-help" class="commands-help">
+        <div class="help-header">
+            <h4>Voice Commands</h4>
+            <button class="close-help">×</button>
+        </div>
+        <div class="help-content">
+            <div class="command-category">
+                <strong>Navigation:</strong>
+                <p>"go to login"</p>
+                <p>"open dashboard"</p>
+                <p>"about page"</p>
+            </div>
+            <div class="command-category">
+                <strong>Forms:</strong>
+                <p>"my username is john"</p>
+                <p>"enter test@email.com in email"</p>
+            </div>
+            <div class="command-category">
+                <strong>Questions:</strong>
+                <p>"explain this page"</p>
+                <p>"what is a dashboard?"</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Modern Voice Assistant Styles */
+    :root {
+        --voice-primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* Violet-Blue */
+        --voice-listening-grad: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        /* Red-Orange */
+        --voice-speaking-grad: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+        /* Teal-Green */
+        --voice-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        --glass-bg: rgba(255, 255, 255, 0.85);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    /* Microphone Button */
+    .voice-mic-btn {
+        position: fixed;
+        bottom: 110px;
+        right: 30px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: var(--voice-primary-grad);
+        color: white;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(118, 75, 162, 0.4);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .voice-mic-btn:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 15px 35px rgba(118, 75, 162, 0.6);
+    }
+
+    .voice-mic-btn::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: inherit;
+        z-index: -1;
+        opacity: 0.6;
+        transition: all 0.3s;
+    }
+
+    .voice-mic-btn:hover::after {
+        transform: scale(1.4);
+        opacity: 0;
+    }
+
+    .voice-mic-btn.listening {
+        background: var(--voice-listening-grad);
+        box-shadow: 0 10px 30px rgba(255, 75, 43, 0.5);
+        animation: breath 2s infinite;
+    }
+
+    .voice-mic-btn.speaking {
+        background: var(--voice-speaking-grad);
+        box-shadow: 0 10px 30px rgba(60, 186, 146, 0.5);
+        animation: speak-bounce 1s infinite;
+    }
+
+    .mic-icon {
+        font-size: 28px;
+        margin-bottom: 0;
+        transition: transform 0.3s;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    .mic-label {
+        font-size: 0;
+        /* Hide text for cleaner look, animate in on hover if needed */
+        opacity: 0;
+        height: 0;
+        transition: all 0.3s;
+    }
+
+    .voice-mic-btn:hover .mic-label {
+        /* Optional: verify if user wants text. Keeping it icon-only for modernization is usually better */
+    }
+
+    /* Status Display - Glassmorphism */
+    .voice-status {
+        position: fixed;
+        bottom: 110px;
+        right: 120px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 12px 20px;
+        border-radius: 16px;
+        box-shadow: var(--voice-shadow);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 9999;
+        border: var(--glass-border);
+        display: none;
+        max-width: 320px;
+        min-width: 200px;
+        animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+    }
+
+    .status-dot.listening {
+        background: #ff4b2b;
+        box-shadow: 0 0 15px #ff4b2b;
+        animation: pulse-red 1.5s infinite;
+    }
+
+    .status-dot.processing {
+        background: #f39c12;
+        box-shadow: 0 0 15px #f39c12;
+        animation: pulse-orange 1s infinite;
+    }
+
+    .status-dot.speaking {
+        background: #3cba92;
+        box-shadow: 0 0 15px #3cba92;
+    }
+
+    #status-text {
+        font-size: 15px;
+        color: #333;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    /* Commands Help - Glassmorphism */
+    .commands-help {
+        position: fixed;
+        bottom: 110px;
+        right: 120px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        z-index: 10001;
+        display: none;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        width: 320px;
+        max-height: 450px;
+        overflow-y: auto;
+        animation: fadeInScale 0.3s ease;
+    }
+
+    .help-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .help-header h4 {
+        margin: 0;
+        color: #764ba2;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .close-help {
+        background: #f0f0f0;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .close-help:hover {
+        background: #ff4b2b;
+        color: white;
+    }
+
+    .command-category {
+        margin-bottom: 20px;
+    }
+
+    .command-category strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #444;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .command-category p {
+        margin: 6px 0;
+        color: #666;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        font-size: 13px;
+        transition: all 0.2s;
+        border-left: 3px solid #764ba2;
+    }
+
+    .command-category p:hover {
+        background: white;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        transform: translateX(5px);
+    }
+
+    /* Animations */
+    @keyframes breath {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(255, 75, 43, 0.7);
+        }
+
+        70% {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 20px rgba(255, 75, 43, 0);
+        }
+
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(255, 75, 43, 0);
+        }
+    }
+
+    @keyframes speak-bounce {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes pulse-red {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 75, 43, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 75, 43, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 75, 43, 0);
+        }
+    }
+</style>
+
+<script>
+    const VoiceAssistant = {
+        recognition: null,
+        synth: window.speechSynthesis,
+        isListening: false,
+        listeningTimer: null,
+        inputMode: null, // null, 'username', 'password'
+
+        init: function () {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("Your browser does not support voice commands. Please use Chrome or Edge.");
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            this.recognition = new SpeechRecognition();
+            this.recognition.continuous = false; // Capture one command at a time for better accuracy
+            this.recognition.interimResults = false;
+            this.recognition.lang = 'en-US';
+
+            this.recognition.onstart = () => {
+                this.isListening = true;
+                this.updateUI('listening');
+
+                let statusMsg = 'Listening...';
+                if (this.inputMode === 'username') statusMsg = 'Listening for email...';
+                if (this.inputMode === 'password') statusMsg = 'Listening for password...';
+                this.showStatus(statusMsg, 'listening');
+
+                // Set 15s timeout
+                if (this.listeningTimer) clearTimeout(this.listeningTimer);
+                this.listeningTimer = setTimeout(() => {
+                    if (this.isListening) {
+                        this.speak("Mic off");
+                        this.stopListening();
+                        this.inputMode = null;
+                    }
+                }, 15000);
+            };
+
+            this.recognition.onend = () => {
+                this.isListening = false;
+                // Clear timer if it ended naturally (e.g. commands processed or browser timeout)
+                // But if it was our timeout that caused it, it's already done.
+                if (this.listeningTimer) clearTimeout(this.listeningTimer);
+
+                if (!this.synth.speaking) {
+                    this.updateUI('idle');
+                    this.showStatus('Click to speak', 'idle');
+                }
+            };
+
+            this.recognition.onresult = (event) => {
+                // Valid result received, clear timeout
+                if (this.listeningTimer) clearTimeout(this.listeningTimer);
+
+                const transcript = event.results[0][0].transcript;
+                console.log("Heard:", transcript);
+
+                if (this.inputMode) {
+                    this.handleInput(transcript);
+                } else {
+                    this.processCommand(transcript);
+                }
+            };
+
+            this.recognition.onerror = (event) => {
+                console.error("Speech error:", event.error);
+                this.showStatus("Error: " + event.error, 'error');
+                this.updateUI('idle');
+            };
+
+            // DOM Elements
+            const micBtn = document.getElementById('voice-mic');
+            micBtn.addEventListener('click', () => {
+                if (this.isListening) {
+                    this.stopListening();
+                } else {
+                    this.startListening();
+                }
+            });
+
+            // Help button logic
+            const helpBtn = document.createElement('button');
+            helpBtn.innerHTML = '?';
+            helpBtn.className = 'voice-help-btn'; // Add CSS if needed, or style inline
+            helpBtn.style.cssText = "position:absolute; right:0; top:-30px; background:#eee; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer;";
+            micBtn.appendChild(helpBtn);
+
+            helpBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('commands-help').style.display = 'block';
+            });
+
+            document.querySelector('.close-help').addEventListener('click', () => {
+                document.getElementById('commands-help').style.display = 'none';
+            });
+
+            // Initial Greeting hint
+            setTimeout(() => this.showStatus("Click mic to speak", 'idle'), 1000);
+        },
+
+        handleInput: function (text) {
+            // Special case to cancel
+            if (text.toLowerCase().includes('cancel') || text.toLowerCase().includes('stop')) {
+                this.inputMode = null;
+                this.speak("Cancelled.");
+                return;
+            }
+
+            if (this.inputMode === 'username') {
+                // Remove spaces for email/username if it looks like one
+                let value = text.toLowerCase().replace(/\s/g, '');
+                // Simple heuristic to fix common speech-to-email errors "at" -> "@"
+                value = value.replace('at', '@').replace('dot', '.');
+
+                this.fillField('email', value);
+                this.inputMode = 'password';
+
+                this.speak("Got it. Now say your password.", () => {
+                    setTimeout(() => this.startListening(), 200);
+                });
+
+            } else if (this.inputMode === 'password') {
+                // Passwords usually don't have spaces, but might be complex. 
+                // We'll strip spaces to be safe for this demo, or keep as is.
+                let value = text.replace(/\s/g, '');
+
+                this.fillField('password', value);
+                this.inputMode = null;
+
+                this.speak("Password entered. ready to login.", () => {
+                    setTimeout(() => this.startListening(), 200);
+                });
+            }
+        },
+
+        startListening: function () {
+            try {
+                this.recognition.start();
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+        stopListening: function () {
+            try {
+                this.recognition.stop();
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+        processCommand: function (command) {
+            this.showStatus('Thinking...', 'processing');
+
+            fetch('/voice/api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.getCSRFToken()
+                },
+                body: JSON.stringify({
+                    command: command,
+                    current_url: window.location.href
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.handleResponse(data.response);
+                    } else {
+                        this.speak("Sorry, something went wrong.");
+                    }
+                })
+                .catch(err => {
+                    console.error("API Error:", err);
+                    this.speak("I couldn't connect to the server.");
+                });
+        },
+
+        handleResponse: function (response) {
+            console.log("Action:", response);
+
+            // define restart logic
+            const restart = () => {
+                if (response.action !== 'stop' && response.action !== 'navigate_and_explain') {
+                    // Small delay to ensure clean state
+                    setTimeout(() => {
+                        this.startListening();
+                    }, 200);
+                }
+            };
+
+            // Always speak the message first
+            if (response.message) {
+                this.speak(response.message, () => {
+                    // After speaking, perform action
+                    this.performAction(response);
+
+                    if (response.action === 'start_login_flow') {
+                        // Don't restart generic listener, start specific flow
+                        // The performAction handles the flow setup
+                    } else {
+                        // Then restart listening
+                        restart();
+                    }
+                });
+            } else {
+                this.performAction(response);
+                if (response.action !== 'start_login_flow') {
+                    restart();
+                }
+            }
+        },
+
+        performAction: function (response) {
+            if (response.action === 'navigate_and_explain' || response.type === 'navigation' || response.action === 'switch_login') {
+                if (response.url) {
+                    // Check if it's a hash on the same page
+                    if (response.url.startsWith('/#') || (response.url.includes('#') && window.location.pathname === '/' && response.url.startsWith('/'))) {
+                        const hash = response.url.split('#')[1];
+                        const el = document.getElementById(hash);
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth' });
+                            // Update URL without reload
+                            history.pushState(null, null, '#' + hash);
+
+                            // If it's a login switch, perform the click after scrolling
+                            if (response.action === 'switch_login') {
+                                setTimeout(() => {
+                                    const btnId = response.target === 'employer' ? 'employerSwitch' : 'employeeSwitch';
+                                    const btn = document.getElementById(btnId);
+                                    if (btn) btn.click();
+                                }, 500); // Small delay to allow scroll to start
+                            }
+                            return;
+                        }
+                    }
+
+                    window.location.href = response.url;
+                }
+            } else if (response.action === 'fill_field') {
+                this.fillField(response.field, response.value);
+            } else if (response.action === 'perform_action') {
+                if (response.action_name === 'submit') {
+                    // Try to find visible form first
+                    const forms = document.querySelectorAll('form');
+                    let submitted = false;
+                    for (let form of forms) {
+                        if (form.offsetParent !== null) {
+                            form.submit();
+                            submitted = true;
+                            break;
+                        }
+                    }
+                    // Fallback to first form if none visible (unlikely)
+                    if (!submitted && forms.length > 0) {
+                        forms[0].submit();
+                    }
+                }
+            } else if (response.action === 'scroll') {
+                if (response.direction === 'down') {
+                    window.scrollBy({ top: window.innerHeight * 0.7, left: 0, behavior: 'smooth' });
+                } else if (response.direction === 'up') {
+                    window.scrollBy({ top: -window.innerHeight * 0.7, left: 0, behavior: 'smooth' });
+                } else if (response.direction === 'top') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else if (response.direction === 'bottom') {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }
+            } else if (response.action === 'start_login_flow') {
+                this.inputMode = 'username';
+                setTimeout(() => {
+                    this.speak("Please say your email.", () => {
+                        setTimeout(() => this.startListening(), 200);
+                    });
+                }, 500);
+            }
+        },
+
+        fillField: function (name, value) {
+            const connectors = ['input', 'textarea', 'select'];
+            let found = false;
+
+            // Try precise name/id match then partial
+            const selectors = [
+                `[name="${name}"]`,
+                `#${name}`,
+                `#id_${name}`,
+                `[name*="${name}"]`,
+                `[id*="${name}"]`
+            ];
+
+            for (let sel of selectors) {
+                const elements = document.querySelectorAll(sel);
+                // Prioritize visible elements
+                for (let el of elements) {
+                    if (el.offsetParent !== null) { // Check visibility
+                        el.value = value;
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                        el.focus();
+                        found = true;
+                        return; // Stop at first visible match
+                    }
+                }
+            }
+
+            // If not found visible, fall back to first invisible
+            for (let sel of selectors) {
+                const el = document.querySelector(sel);
+                if (el) {
+                    el.value = value;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                console.warn(`Could not find field: ${name}`);
+            }
+        },
+
+        speak: function (text, callback) {
+            if (!text) return;
+
+            this.updateUI('speaking');
+
+            // Cancel any current speech
+            this.synth.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+
+            // Get voices (try to pick a nice one)
+            let voices = this.synth.getVoices();
+            // Retry getting voices if empty (chrome quirk)
+            if (!voices.length) {
+                this.synth.onvoiceschanged = () => {
+                    this.speak(text, callback);
+                }
+                return;
+            }
+
+            const preferred = voices.find(v => v.name.includes('Google US English')) || voices.find(v => v.lang === 'en-US') || voices[0];
+            if (preferred) utterance.voice = preferred;
+
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+
+            utterance.onend = () => {
+                this.updateUI('idle');
+                if (callback) callback();
+            };
+
+            utterance.onerror = (e) => {
+                console.error("TTS Error", e);
+                this.updateUI('idle');
+            };
+
+            this.synth.speak(utterance);
+        },
+
+        updateUI: function (state) {
+            const btn = document.getElementById('voice-mic');
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            const statusDiv = document.getElementById('voice-status'); // Ensure we get the div to show/hide
+
+            // Reset classes
+            btn.classList.remove('listening', 'speaking');
+            dot.classList.remove('listening', 'processing', 'speaking');
+
+            statusDiv.style.display = 'flex'; // Always show status box when active
+
+            if (state === 'listening') {
+                btn.classList.add('listening');
+                dot.classList.add('listening');
+                text.textContent = "Listening...";
+            } else if (state === 'speaking') {
+                btn.classList.add('speaking');
+                dot.classList.add('speaking');
+                text.textContent = "Speaking...";
+            } else if (state === 'processing') {
+                dot.classList.add('processing');
+                text.textContent = "Thinking...";
+            } else {
+                // Idle
+                text.textContent = "Click to speak";
+                // Optional: Hide status after a delay
+                setTimeout(() => {
+                    if (!this.isListening && !this.synth.speaking) {
+                        statusDiv.style.display = 'none';
+                    }
+                }, 3000);
+            }
+        },
+
+        showStatus: function (msg, type) {
+            document.getElementById('status-text').textContent = msg;
+            document.getElementById('voice-status').style.display = 'flex';
+        },
+
+        getCSRFToken: function () {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        VoiceAssistant.init();
+    });
+</script>

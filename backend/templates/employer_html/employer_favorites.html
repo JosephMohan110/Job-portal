@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Workers </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4a6fff;
+            --primary-light: #e8eeff;
+            --primary-dark: #3a5fef;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+            --sidebar-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%);
+            --sidebar-hover: rgba(74, 111, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header and Navigation */
+        .dashboard-header {
+            background-color: var(--white);
+            color: var(--text-dark);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            background: var(--primary);
+            border: none;
+            color: var(--white);
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px var(--shadow);
+            display: none;
+        }
+
+        .menu-toggle:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: var(--primary-light);
+            transition: all 0.3s ease;
+            color: var(--primary);
+        }
+
+        .logo:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .page-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+            box-shadow: 0 4px 10px var(--shadow);
+            overflow: hidden;
+            border: 2px solid var(--white);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-avatar .profile-icon {
+            font-size: 1.2rem;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px var(--shadow);
+            width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 101;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .user-info:focus-within .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .user-dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .user-dropdown a:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .user-dropdown i {
+            width: 20px;
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .dashboard-menu {
+            display: flex;
+            list-style: none;
+            margin-top: 1rem;
+            background: var(--light);
+            border-radius: 12px;
+            padding: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .dashboard-menu li {
+            margin: 0 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .dashboard-menu a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dashboard-menu a:hover, .dashboard-menu a.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 140px);
+            padding: 2rem 0;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            height: fit-content;
+            box-shadow: 0 10px 30px var(--shadow);
+            position: sticky;
+            top: 120px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: var(--sidebar-hover);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            padding: 0 1rem;
+        }
+
+        /* Mobile Sidebar */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Page Header Section */
+        .page-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .page-header h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header h1 i {
+            font-size: 1.8rem;
+        }
+
+        .page-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 20px var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .card-content {
+            flex-grow: 1;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+            box-shadow: 0 5px 15px var(--shadow);
+            flex-shrink: 0;
+        }
+
+        .bg-blue {
+            background: var(--primary);
+        }
+
+        .bg-mint {
+            background: var(--success);
+        }
+
+        .bg-peach {
+            background: var(--warning);
+        }
+
+        .bg-pink {
+            background: var(--danger);
+        }
+
+        .stat-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .stat-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h2 {
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 5px 15px var(--shadow);
+            background: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--shadow);
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 20px var(--shadow);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px var(--shadow);
+            background: var(--white);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(74, 111, 255, 0.3);
+            outline: none;
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px var(--shadow);
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--shadow);
+            background: var(--dark);
+        }
+
+        /* Favorite Workers Grid */
+        .workers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .worker-card {
+            background: var(--white);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px var(--shadow);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid var(--border-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .worker-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px var(--shadow-lg);
+        }
+
+        .worker-card-header {
+            position: relative;
+            height: 110px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.3rem;
+        }
+
+        .worker-avatar {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.6rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            bottom: -35px;
+            border: 4px solid var(--white);
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .worker-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .favorite-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--danger);
+            font-size: 1.2rem;
+            box-shadow: 0 3px 10px var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            z-index: 3;
+        }
+
+        .favorite-badge:hover {
+            transform: scale(1.15);
+            background: var(--danger);
+            color: var(--white);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .worker-card-body {
+            padding: 3rem 1.6rem 1.6rem;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .worker-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        .worker-profession {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .worker-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 3px;
+        }
+
+        .rating-star {
+            color: #ffc107;
+            font-size: 1rem;
+        }
+
+        .rating-value {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+
+        .review-count {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-left: 4px;
+        }
+
+        .worker-location {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .worker-location i {
+            color: var(--primary);
+        }
+
+        .worker-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 1.2rem;
+            min-height: 26px;
+        }
+
+        .skill-tag {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .skill-tag:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* Worker Notes */
+        .worker-notes {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-top: 0.8rem;
+            text-align: left;
+            border-left: 3px solid var(--primary);
+            flex-grow: 1;
+        }
+
+        .worker-notes h4 {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .worker-notes p {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .favorite-date {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding-top: 0.8rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Worker Footer */
+        .worker-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.6rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--light);
+            gap: 0.8rem;
+        }
+
+        .worker-price {
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .price-amount {
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .price-unit {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Worker Actions */
+        .worker-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            flex-grow: 1;
+        }
+
+        .btn-xs {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            white-space: nowrap;
+            min-width: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-xs i {
+            font-size: 0.85rem;
+        }
+
+        .btn-danger-xs {
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-danger-xs:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-primary-xs {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-primary-xs:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(74, 111, 255, 0.3);
+        }
+
+        .btn-secondary-xs {
+            background: var(--secondary);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-secondary-xs:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 12px 25px var(--shadow);
+            margin: 2.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--primary-light);
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .empty-state h3 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            color: var(--text-light);
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        /* Messages */
+        .messages-container {
+            margin-bottom: 2rem;
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid transparent;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
+        .alert i {
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        .dashboard-footer {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 1.5rem 0;
+            text-align: center;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .workers-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 70%;
+                max-width: 320px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 1000;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                border-radius: 0;
+                overflow-y: auto;
+                display: block;
+                padding-top: 70px;
+                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+            
+            .sidebar-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem 1.5rem;
+                background: var(--white);
+                color: var(--text-dark);
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 70%;
+                max-width: 320px;
+                z-index: 1001;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .sidebar-title {
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+            
+            .close-sidebar {
+                background: none;
+                border: none;
+                color: var(--text-dark);
+                font-size: 1.5rem;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .close-sidebar:hover {
+                transform: scale(1.1);
+                color: var(--primary);
+            }
+            
+            /* Show menu toggle and hide top menu on small screens */
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .dashboard-menu {
+                display: none;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .worker-actions {
+                flex-wrap: nowrap;
+            }
+            
+            .btn-xs {
+                min-width: 70px;
+                padding: 7px 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: 100%;
+            }
+            
+            .worker-actions {
+                flex-direction: column;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            /* Move page title below logo on mobile */
+            .logo-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .page-title {
+                margin-left: 0;
+            }
+
+            .workers-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .worker-card-footer {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.8rem;
+            }
+            
+            .worker-price {
+                text-align: center;
+            }
+            
+            .worker-actions {
+                justify-content: center;
+            }
+
+            .page-header h1 {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .user-info span {
+                display: none;
+            }
+            
+            .worker-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-dropdown {
+                width: 180px;
+            }
+            
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .stat-card h3 {
+                font-size: 1.5rem;
+            }
+            
+            .sidebar {
+                width: 85%;
+            }
+            
+            .sidebar-header {
+                width: 85%;
+            }
+            
+            /* Adjust page title for very small screens */
+            .page-title h1 {
+                font-size: 1.3rem;
+            }
+
+            .workers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .worker-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn-xs {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .page-header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .empty-state {
+                padding: 2.5rem 1.5rem;
+            }
+            
+            .empty-state h3 {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .section-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .worker-card {
+                margin: 0 0.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Card Hover Effects */
+        .worker-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(74, 111, 255, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            border-radius: 14px;
+        }
+
+        .worker-card:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    {% include 'chat_bot/chat_bot.html' %}
+        
+              {% include 'employer_html/employer_header.html' %}
+
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container container">
+        <div class="overlay" id="overlay"></div>
+        
+
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Messages Display -->
+            <div class="messages-container">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}error{% else %}{{ message.tags }}{% endif %}">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-heart"></i> Favorite Workers</h1>
+                <p>Your saved workers for quick access and future hiring</p>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="dashboard-cards">
+                <div class="stat-card">
+                    <div class="card-header">
+                        <div class="card-content">
+                            <h3>{{ total_favorites }}</h3>
+                            <p>Total Favorites</p>
+                        </div>
+                        <div class="card-icon bg-blue">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="card-header">
+                        <div class="card-content">
+                            <h3>{{ hired_from_favorites }}</h3>
+                            <p>Hired from Favorites</p>
+                        </div>
+                        <div class="card-icon bg-mint">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="card-header">
+                        <div class="card-content">
+                            <h3>{{ available_now }}</h3>
+                            <p>Available Now</p>
+                        </div>
+                        <div class="card-icon bg-peach">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="card-header">
+                        <div class="card-content">
+                            <h3>{{ top_rated }}</h3>
+                            <p>Top Rated (≥ 4.5)</p>
+                        </div>
+                        <div class="card-icon bg-pink">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <h2>Find Your Favorite Workers</h2>
+                <p>Search and filter your saved workers</p>
+                <form method="GET" class="search-box">
+                    <input type="text" 
+                           name="search" 
+                           class="search-input" 
+                           placeholder="Search by worker name or skill..." 
+                           value="{{ search_query }}">
+                    
+                    <select name="profession" class="search-input">
+                        <option value="">All Professions</option>
+                        <option value="plumber" {% if profession_filter == "plumber" %}selected{% endif %}>Plumbers</option>
+                        <option value="electrician" {% if profession_filter == "electrician" %}selected{% endif %}>Electricians</option>
+                        <option value="carpenter" {% if profession_filter == "carpenter" %}selected{% endif %}>Carpenters</option>
+                        <option value="painter" {% if profession_filter == "painter" %}selected{% endif %}>Painters</option>
+                        <option value="mason" {% if profession_filter == "mason" %}selected{% endif %}>Masons</option>
+                        <option value="cleaner" {% if profession_filter == "cleaner" %}selected{% endif %}>Cleaners</option>
+                        <option value="technician" {% if profession_filter == "technician" %}selected{% endif %}>Technicians</option>
+                    </select>
+                    
+                    <select name="availability" class="search-input">
+                        <option value="">All Availability</option>
+                        <option value="available" {% if availability_filter == "available" %}selected{% endif %}>Available Now</option>
+                        <option value="busy" {% if availability_filter == "busy" %}selected{% endif %}>Currently Busy</option>
+                        <option value="unavailable" {% if availability_filter == "unavailable" %}selected{% endif %}>On Break</option>
+                    </select>
+                    
+                    <button type="submit" class="search-btn"><i class="fas fa-search"></i> Search</button>
+                    
+                    {% if search_query or profession_filter or availability_filter %}
+                        <a href="{% url 'employer_favorites' %}" class="btn btn-danger">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Favorite Workers Section -->
+            <div class="section-header">
+                <h2>Your Favorite Workers</h2>
+                <div>
+                    <a href="{% url 'employer_find_workers' %}" class="btn btn-success">
+                        <i class="fas fa-search-plus"></i> Find More Workers
+                    </a>
+                </div>
+            </div>
+
+            {% if favorite_workers %}
+                <div class="workers-grid">
+                    {% for worker in favorite_workers %}
+                        <div class="worker-card">
+                            <div class="worker-card-header">
+                                <div class="worker-avatar">
+                                    {% if worker.employee.profile_image %}
+                                        <img src="{{ worker.employee.profile_image.url }}" alt="{{ worker.employee.full_name }}">
+                                    {% else %}
+                                        {{ worker.employee.first_name|slice:":1"|upper }}{{ worker.employee.last_name|slice:":1"|upper }}
+                                    {% endif %}
+                                </div>
+                                
+                                <form method="POST" action="{% url 'remove_favorite' worker.favorite_id %}" class="favorite-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="favorite-badge" title="Remove from favorites">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <div class="worker-card-body">
+                                <h3 class="worker-name">{{ worker.employee.full_name }}</h3>
+                                <p class="worker-profession">{{ worker.employee.job_title|default:"General Worker" }}</p>
+                                
+                                <div class="worker-rating">
+                                    <div class="rating-stars">
+                                        {% with stars=worker.avg_rating %}
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= stars %}
+                                                    <i class="fas fa-star rating-star"></i>
+                                                {% elif forloop.counter|add:"-0.5" <= stars %}
+                                                    <i class="fas fa-star-half-alt rating-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star rating-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endwith %}
+                                    </div>
+                                    <span class="rating-value">{{ worker.avg_rating|floatformat:1 }}</span>
+                                    <span class="review-count">({{ worker.review_count }} reviews)</span>
+                                </div>
+                                
+                                <div class="worker-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>
+                                        {% if worker.city and worker.state %}
+                                            {{ worker.city }}, {{ worker.state }}
+                                        {% elif worker.city %}
+                                            {{ worker.city }}
+                                        {% elif worker.state %}
+                                            {{ worker.state }}
+                                        {% else %}
+                                            Location not specified
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                <div class="worker-skills">
+                                    {% if worker.skills %}
+                                        {% for skill in worker.skills %}
+                                            <span class="skill-tag">{{ skill }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="skill-tag" style="background: var(--gray-light); color: var(--gray);">
+                                            No skills listed
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if worker.notes %}
+                                    <div class="worker-notes">
+                                        <h4><i class="fas fa-sticky-note"></i> Your Notes</h4>
+                                        <p>{{ worker.notes|truncatechars:70 }}</p>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="favorite-date">
+                                    <i class="far fa-clock"></i>
+                                    Added {{ worker.created_at|timesince }} ago
+                                </div>
+                            </div>
+                            
+                            <div class="worker-card-footer">
+                                <div class="worker-price">
+                                    <span class="price-amount">{{ worker.wage_estimate }}</span>
+                                    <span class="price-unit">Daily Rate</span>
+                                </div>
+                                
+                                <div class="worker-actions">
+                                    <form method="POST" action="{% url 'remove_favorite_by_employee' worker.employee.employee_id %}" class="remove-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-xs btn-danger-xs">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </button>
+                                    </form>
+                                    
+                                    <a href="#" class="btn-xs btn-primary-xs">
+                                        <i class="fas fa-calendar-alt"></i> Hire
+                                    </a>
+
+                                    <a href="#" class="btn-xs btn-primary-xs">
+                                        <i class="fas fa-message"></i> Message
+                                    </a>
+                                    
+                                    <a href="#" class="btn-xs btn-secondary-xs">
+                                        <i class="fas fa-user"></i> Profile
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <i class="fas fa-heart-broken"></i>
+                    <h3>No Favorite Workers Yet</h3>
+                    <p>
+                        {% if search_query or profession_filter or availability_filter %}
+                            No workers match your search criteria. Try adjusting your filters or search terms.
+                        {% else %}
+                            You haven't added any workers to your favorites yet. Start by searching for skilled workers and adding them to your favorites for quick access.
+                        {% endif %}
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="{% url 'employer_find_workers' %}" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Find Workers
+                        </a>
+                        {% if search_query or profession_filter or availability_filter %}
+                            <a href="{% url 'employer_favorites' %}" class="btn">
+                                <i class="fas fa-times"></i> Clear Filters
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <!-- Include Footer -->
+
+    <script>
+
+        
+        // Add smooth hover effects
+        document.querySelectorAll('.worker-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.zIndex = '10';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.zIndex = '1';
+            });
+        });
+        
+        // Enhance skill tags hover
+        document.querySelectorAll('.skill-tag').forEach(tag => {
+            tag.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px) scale(1.05)';
+            });
+            
+            tag.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        // Form submission feedback
+        document.querySelectorAll('.search-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-search"></i> Search';
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>

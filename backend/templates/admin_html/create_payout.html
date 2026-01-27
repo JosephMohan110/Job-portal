@@ -1,0 +1,126 @@
+<!-- templates/admin_html/create_payout.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Payout</title>
+    <style>
+        /* Add similar styles from the main template */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    {% include 'admin_html/admin_sidebar.html' %}
+    
+    <main class="main-content" style="margin-left: 260px; padding: 24px;">
+        <div class="page-header">
+            <div class="header-title">
+                <h1>Create New Payout</h1>
+                <p>Create a payout for a worker</p>
+            </div>
+        </div>
+        
+        <div class="form-container">
+            <form method="POST" action="{% url 'create_payout' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">Select Worker:</label>
+                    <select name="employee_id" class="form-control" required>
+                        <option value="">-- Select Worker --</option>
+                        {% for employee in employees %}
+                        <option value="{{ employee.employee_id }}">
+                            {{ employee.full_name }} (₹{{ employee.total_earnings|default:0 }} earnings)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Amount (₹):</label>
+                    <input type="number" name="amount" class="form-control" min="1" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Payout Method:</label>
+                    <select name="payout_method" class="form-control" required>
+                        {% for value, label in payout_method_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description (Optional):</label>
+                    <textarea name="description" class="form-control" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Bank Account Number (if bank transfer):</label>
+                    <input type="text" name="bank_account_number" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Bank IFSC Code:</label>
+                    <input type="text" name="bank_ifsc" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Bank Name:</label>
+                    <input type="text" name="bank_name" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">UPI ID (if UPI):</label>
+                    <input type="text" name="upi_id" class="form-control">
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">Create Payout</button>
+                    <a href="{% url 'admin_payment_dashboard' %}" class="btn" style="background-color: #e5e7eb;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

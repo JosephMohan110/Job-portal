@@ -1,0 +1,2370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - WorkNest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary: #3a86ff;
+            --primary-light: #e6f0ff;
+            --primary-dark: #2667cc;
+            --secondary: #8338ec;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+            --card-bg: #ffffff;
+            --sidebar-bg: #1a2238;
+            --sidebar-text: #b0b7c3;
+            --sidebar-active: #3a86ff;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Messages */
+        .messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-success {
+            background-color: var(--success);
+            color: white;
+            border-left: 4px solid #049c7a;
+        }
+
+        .alert-error {
+            background-color: var(--danger);
+            color: white;
+            border-left: 4px solid #d12b55;
+        }
+
+        .alert-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+            border-left: 4px solid #e6b800;
+        }
+
+        .alert-info {
+            background-color: var(--primary);
+            color: white;
+            border-left: 4px solid var(--primary-dark);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Overlay for Mobile */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: fixed;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 1.5rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
+            border-left: 4px solid var(--primary);
+        }
+
+        .sidebar-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Close button for sidebar on mobile */
+        .sidebar-close {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 0;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .page-title p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon i {
+            font-size: 1.3rem;
+            color: var(--gray);
+            transition: color 0.3s;
+        }
+
+        .notification-icon:hover i {
+            color: var(--primary);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .user-profile:hover {
+            background: var(--gray-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+            font-size: 1.1rem;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* User Dropdown Menu */
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            width: 220px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 20px;
+            width: 16px;
+            height: 16px;
+            background: var(--white);
+            transform: rotate(45deg);
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        .dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropdown-header .user-avatar {
+            width: 45px;
+            height: 45px;
+        }
+
+        .dropdown-header .user-info .user-name {
+            font-size: 1rem;
+        }
+
+        .dropdown-header .user-info .user-email {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-menu li {
+            margin: 0;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-menu a:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .dropdown-menu i {
+            margin-right: 10px;
+            width: 18px;
+            text-align: center;
+            color: var(--gray);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 0.5rem 0;
+        }
+
+        /* Profile Page Specific Styles */
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Profile Header - LinkedIn inspired */
+        .profile-header {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px var(--shadow);
+            margin-bottom: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-banner {
+            height: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+        }
+
+        .profile-banner-edit {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .profile-banner-edit:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .profile-info-section {
+            padding: 0 32px 32px;
+            position: relative;
+        }
+
+        .profile-avatar-container {
+            position: relative;
+            margin-top: -80px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 6px solid var(--white);
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: var(--white);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-avatar-edit {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: var(--primary);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.3s;
+        }
+
+        .profile-avatar-edit:hover {
+            background: var(--primary-dark);
+        }
+
+        .profile-name {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .profile-title {
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .profile-location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin: 25px 0;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* Profile Content Grid - Instagram/Naukri inspired */
+        .profile-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .profile-section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 10px var(--shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .section-edit {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .section-edit:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Portfolio Grid - Instagram inspired */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .portfolio-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .portfolio-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .portfolio-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: white;
+            padding: 10px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .portfolio-item:hover .portfolio-overlay {
+            transform: translateY(0);
+        }
+
+        .portfolio-upload {
+            border: 2px dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            background: var(--light);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .portfolio-upload:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* Portfolio Item Actions */
+        .portfolio-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .portfolio-item:hover .portfolio-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .edit-btn {
+            background: var(--white);
+            color: var(--primary);
+        }
+
+        .edit-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .delete-btn {
+            background: var(--white);
+            color: var(--danger);
+        }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        /* Experience Section */
+        .experience-item {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .experience-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .experience-item h3 {
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+
+        .experience-meta {
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .experience-desc {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .experience-actions {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Certificates Section */
+        .certificates-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .certificate-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: box-shadow 0.3s, transform 0.3s;
+            position: relative;
+        }
+
+        .certificate-item:hover {
+            box-shadow: 0 4px 12px var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .certificate-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .certificate-details {
+            flex: 1;
+        }
+
+        .certificate-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .certificate-issuer {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .certificate-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .certificate-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .certificate-download {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .certificate-download:hover {
+            background: var(--primary-light);
+        }
+
+        .certificate-delete {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .certificate-delete:hover {
+            background: rgba(239, 71, 111, 0.1);
+        }
+
+        .upload-certificate {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            background: var(--light);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-certificate:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* Skills Section */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .skill-tag {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .skill-tag:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .remove-skill {
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            background: none;
+            border: none;
+            color: inherit;
+        }
+
+        .remove-skill:hover {
+            opacity: 1;
+        }
+
+        .skill-add {
+            background: var(--light);
+            color: var(--text-light);
+            border: 1px dashed var(--border-color);
+            cursor: pointer;
+        }
+
+        .skill-add:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Availability Section */
+        .availability-content {
+            margin-top: 15px;
+        }
+
+        .availability-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-indicator.available {
+            background: var(--success);
+            box-shadow: 0 0 0 3px rgba(6, 214, 160, 0.2);
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .availability-details {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--text-light);
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        /* Modal for Uploads */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .modal-close:hover {
+            color: var(--dark);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--dark);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 10px;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .file-info {
+            display: none;
+            margin-top: 10px;
+            padding: 8px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .file-info.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-light);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #d12b55;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        /* Menu Toggle for Mobile */
+        .menu-toggle {
+            display: none;
+            background: var(--primary);
+            border: none;
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        /* Edit Forms */
+        .edit-form {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .edit-form.active {
+            display: block;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: flex-end;
+        }
+
+        /* Confirmation Modal */
+        .confirmation-modal {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .confirmation-icon {
+            font-size: 3rem;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .confirmation-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .confirmation-message {
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .profile-content {
+                grid-template-columns: 1.5fr 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-close {
+                display: block;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .profile-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-banner {
+                height: 200px;
+            }
+            
+            .profile-avatar {
+                width: 140px;
+                height: 140px;
+                font-size: 3rem;
+            }
+            
+            .profile-name {
+                font-size: 1.8rem;
+            }
+            
+            .profile-title {
+                font-size: 1.1rem;
+            }
+            
+            .profile-stats {
+                flex-wrap: wrap;
+                gap: 20px;
+                justify-content: space-around;
+            }
+            
+            .stat-item {
+                min-width: 120px;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .top-bar {
+                padding: 1rem;
+            }
+            
+            .profile-container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .user-info {
+                display: none;
+            }
+            
+            .page-title h1 {
+                font-size: 1.5rem;
+            }
+            
+            .profile-info-section {
+                padding: 0 20px 20px;
+            }
+            
+            .profile-avatar {
+                width: 120px;
+                height: 120px;
+                font-size: 2.5rem;
+            }
+            
+            .profile-avatar-edit {
+                width: 35px;
+                height: 35px;
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .profile-name {
+                font-size: 1.6rem;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .certificate-item {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .certificate-details {
+                text-align: center;
+            }
+            
+            .skills-container {
+                justify-content: center;
+            }
+            
+            .modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .profile-stats {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .stat-item {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 10px;
+            }
+            
+            .stat-item:last-child {
+                border-bottom: none;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Overlay for Mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar -->
+    {% include 'employee_html/employee_header.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <h1>MY PROFILE</h1>
+                <p>Manage your professional profile and showcase your work</p>
+            </div>
+
+            {% include 'employee_html/employee_dropdown.html' %}
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-container">
+            <!-- LinkedIn-style Profile Header -->
+            <div class="profile-header">
+                <div class="profile-banner">
+                    <button class="profile-banner-edit" id="editBanner" onclick="alert('Feature coming soon!')">
+                        <i class="fas fa-camera"></i> Edit Cover
+                    </button>
+                    <div class="banner-content">
+                        <i class="fas fa-image" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+                
+                <div class="profile-info-section">
+                    <div class="profile-avatar-container">
+                        <div class="profile-avatar" id="profileAvatar">
+                            {% if employee.profile_image %}
+                                <img src="{{ employee.profile_image.url }}" alt="{{ employee.full_name }}">
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <!-- Profile Image Update Form -->
+                        <form method="POST" action="{% url 'update_employee_profile_image' %}" enctype="multipart/form-data" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="button" class="profile-avatar-edit" id="editAvatar" onclick="document.getElementById('profileImageInput').click()">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <input type="file" id="profileImageInput" name="profile_image" accept="image/*" style="display: none;" onchange="this.form.submit()">
+                        </form>
+                    </div>
+                    
+                    <h1 class="profile-name">{{ employee.full_name }}</h1>
+                    <div class="profile-title">{{ employee.job_title|default:"Professional Service Provider" }}</div>
+                    <div class="profile-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ employee.location|default:"Location not specified" }} • 2.5 km from your location</span>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ employee.total_jobs_done|default:"0" }}</div>
+                            <div class="stat-label">Jobs Completed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ employee.rating|default:"0.0" }}★</div>
+                            <div class="stat-label">Average Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ employee.success_rate|default:"0" }}%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ employee.years_experience|default:"0" }}</div>
+                            <div class="stat-label">Years Experience</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Profile Content Grid -->
+            <div class="profile-content">
+                <!-- Left Column: About, Portfolio, Experience -->
+                <div class="left-column">
+                    <!-- About Section -->
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h2 class="section-title">About Me</h2>
+                            <button class="section-edit" id="editAboutBtn">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                        <div class="about-content" id="aboutContent">
+                            {% if employee.bio %}
+                                {{ employee.bio|linebreaks }}
+                            {% else %}
+                                Professional service provider with experience in various jobs. Committed to providing timely, efficient, and high-quality service to all clients.
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Edit About Form -->
+                        <div class="edit-form" id="editAboutForm">
+                            <form method="POST" action="{% url 'update_employee_bio' %}">
+                                {% csrf_token %}
+                                <textarea name="bio" class="edit-textarea" placeholder="Tell employers about your skills, experience, and what makes you unique...">{{ employee.bio|default:"" }}</textarea>
+                                <div class="form-buttons">
+                                    <button type="button" class="btn btn-outline" id="cancelEditAbout">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Section - Instagram Style Grid -->
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h2 class="section-title">My Work Portfolio</h2>
+                            <button class="section-edit" id="addPortfolioBtn">
+                                <i class="fas fa-plus"></i> Add Photo
+                            </button>
+                        </div>
+                        <p class="section-subtitle">Showcase your completed work to attract more clients</p>
+                        
+                        <div class="portfolio-grid">
+                            {% for item in portfolio_items %}
+                            <div class="portfolio-item" onclick="showPortfolioImage('{{ item.image.url }}', '{{ item.title }}')">
+                                <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                                <div class="portfolio-overlay">
+                                    <span>{{ item.title }}</span>
+                                </div>
+                                <div class="portfolio-actions">
+                                    <button class="action-btn edit-btn" onclick="editPortfolioItem(event, '{{ item.id }}', '{{ item.title }}', '{{ item.description }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" action="{% url 'delete_employee_portfolio' item.id %}" class="delete-form" onsubmit="return confirmDelete(event, 'portfolio item')">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-btn delete-btn">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                            <!-- Upload Portfolio Button -->
+                            <div class="portfolio-upload" onclick="showUploadModal('portfolio')">
+                                <i class="fas fa-plus upload-icon"></i>
+                                <span>Upload Work</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Experience Section -->
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Work Experience</h2>
+                            <button class="section-edit" id="addExperienceBtn">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        
+                        {% for exp in experiences %}
+                        <div class="experience-item">
+                            <h3>{{ exp.job_title }}</h3>
+                            <p class="experience-meta">{{ exp.company }} • {{ exp.start_date|date:"M Y" }} - {% if exp.currently_working %}Present{% else %}{{ exp.end_date|date:"M Y" }}{% endif %}</p>
+                            <p class="experience-desc">{{ exp.description|linebreaks }}</p>
+                            <div class="experience-actions">
+                                <button class="btn btn-outline btn-sm" onclick="editExperience(event, '{{ exp.id }}', '{{ exp.job_title }}', '{{ exp.company }}', '{{ exp.start_date|date:"Y-m-d" }}', '{{ exp.end_date|date:"Y-m-d" }}', '{{ exp.currently_working }}', '{{ exp.description }}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <form method="POST" action="{% url 'delete_employee_experience' exp.id %}" class="delete-form" onsubmit="return confirmDelete(event, 'experience')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="section-subtitle">No experience added yet. Add your work experience to showcase your expertise.</p>
+                        {% endfor %}
+                        
+                        <!-- Add Experience Form -->
+                        <div class="edit-form" id="addExperienceForm">
+                            <form method="POST" action="{% url 'add_employee_experience' %}" id="experienceForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="experience_id" id="experienceId" value="">
+                                <div class="form-group">
+                                    <label>Job Title *</label>
+                                    <input type="text" name="job_title" id="jobTitle" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Company *</label>
+                                    <input type="text" name="company" id="company" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Start Date *</label>
+                                    <input type="date" name="start_date" id="startDate" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="date" name="end_date" id="endDate" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" name="currently_working" id="currentlyWorking"> I currently work here
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea name="description" id="experienceDescription" class="form-textarea" placeholder="Describe your responsibilities and achievements..."></textarea>
+                                </div>
+                                <div class="form-buttons">
+                                    <button type="button" class="btn btn-outline" id="cancelAddExperience">Cancel</button>
+                                    <button type="submit" class="btn btn-primary" id="experienceSubmitBtn">Add Experience</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Certificates, Skills, Availability -->
+                <div class="right-column">
+                    <!-- Certificates Section - LinkedIn/Naukri Style -->
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Certificates & Licenses</h2>
+                            <button class="section-edit" id="addCertificateBtn">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <p class="section-subtitle">Upload your professional certifications</p>
+                        
+                        <div class="certificates-list">
+                            {% for cert in certificates %}
+                            <div class="certificate-item">
+                                <div class="certificate-icon">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div class="certificate-details">
+                                    <div class="certificate-name">{{ cert.name }}</div>
+                                    <div class="certificate-issuer">{{ cert.issuer }}</div>
+                                    <div class="certificate-date">
+                                        Issued: {{ cert.issue_date|date:"M Y" }} 
+                                        {% if cert.expiry_date %}
+                                            • Expires: {{ cert.expiry_date|date:"M Y" }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="certificate-actions">
+                                    {% if cert.certificate_file %}
+                                    <a href="{{ cert.certificate_file.url }}" download class="certificate-download" title="Download">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    {% endif %}
+                                    <form method="POST" action="{% url 'delete_employee_certificate' cert.id %}" class="delete-form" onsubmit="return confirmDelete(event, 'certificate')">
+                                        {% csrf_token %}
+                                        <button type="submit" class="certificate-delete" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                            <!-- Upload Certificate Button -->
+                            <div class="upload-certificate" onclick="showUploadModal('certificate')">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Upload Certificate</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skills Section -->
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Skills & Expertise</h2>
+                            <button class="section-edit" id="addSkillBtn">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        
+                        <div class="skills-container">
+                            {% for skill in skills %}
+                            <div class="skill-tag">
+                                {{ skill }}
+                                <form method="POST" action="{% url 'remove_employee_skill' %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="skill_name" value="{{ skill }}">
+                                    <button type="submit" class="remove-skill">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                            
+                            <!-- Add Skill Button -->
+                            <div class="skill-tag skill-add" id="addNewSkillBtn">
+                                + Add Skill
+                            </div>
+                        </div>
+                        
+                        <!-- Add Skill Form -->
+                        <div class="edit-form" id="addSkillForm">
+                            <form method="POST" action="{% url 'add_employee_skill' %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label>Add New Skill</label>
+                                    <input type="text" name="skill_name" class="form-input" placeholder="Enter skill name">
+                                    <p class="upload-hint">Or add multiple skills separated by commas</p>
+                                    <textarea name="skills_text" class="form-textarea" placeholder="e.g., Plumbing, Electrical Work, Carpentry, Painting" rows="3"></textarea>
+                                </div>
+                                <div class="form-buttons">
+                                    <button type="button" class="btn btn-outline" id="cancelAddSkill">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Add Skills</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Availability Section -->
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Availability</h2>
+                            <button class="section-edit" id="editAvailabilityBtn">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                        
+                        <div class="availability-content">
+                            <div class="availability-status">
+                                <div class="status-indicator available"></div>
+                                <span class="status-text">{{ employee.availability_status|default:"Currently Available" }}</span>
+                            </div>
+                            
+                            <div class="availability-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Response Time:</span>
+                                    <span class="detail-value">{{ employee.response_time|default:"Within 1 hour" }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Working Hours:</span>
+                                    <span class="detail-value">{{ employee.working_hours|default:"9:00 AM - 7:00 PM" }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Service Area:</span>
+                                    <span class="detail-value">{{ employee.service_area|default:"Within 10 km radius" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Edit Availability Form -->
+                        <div class="edit-form" id="editAvailabilityForm">
+                            <form method="POST" action="{% url 'update_employee_availability' %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label>Availability Status</label>
+                                    <input type="text" name="availability_status" class="form-input" value="{{ employee.availability_status|default:'Currently Available' }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Response Time</label>
+                                    <input type="text" name="response_time" class="form-input" value="{{ employee.response_time|default:'Within 1 hour' }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Working Hours</label>
+                                    <input type="text" name="working_hours" class="form-input" value="{{ employee.working_hours|default:'9:00 AM - 7:00 PM' }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Service Area</label>
+                                    <input type="text" name="service_area" class="form-input" value="{{ employee.service_area|default:'Within 10 km radius' }}" required>
+                                </div>
+                                <div class="form-buttons">
+                                    <button type="button" class="btn btn-outline" id="cancelEditAvailability">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title" id="modalTitle">Upload File</h2>
+            
+            <form method="POST" action="" enctype="multipart/form-data" id="uploadForm">
+                {% csrf_token %}
+                <input type="hidden" name="upload_type" id="uploadType" value="">
+                
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt" id="uploadIcon"></i>
+                    <p id="uploadText">Click to select a file</p>
+                    <p class="upload-hint" id="uploadHint">Supports JPG, PNG • Max 5MB</p>
+                    <input type="file" class="file-input" id="fileInput" name="image">
+                    <div class="file-info" id="fileInfo">
+                        <span id="fileName"></span> (<span id="fileSize"></span> MB)
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label id="titleLabel">Title *</label>
+                    <input type="text" id="uploadTitle" name="title" placeholder="Enter title" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <textarea id="uploadDescription" name="description" placeholder="Add a description" class="form-textarea"></textarea>
+                </div>
+                
+                <div id="certificateFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Issuer *</label>
+                        <input type="text" id="uploadIssuer" name="issuer" placeholder="Issuing organization" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Issue Date *</label>
+                        <input type="date" id="uploadIssueDate" name="issue_date" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Expiry Date</label>
+                        <input type="date" id="uploadExpiryDate" name="expiry_date" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeUploadModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div class="modal-overlay" id="imagePreviewModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <button class="modal-close" onclick="closeImageModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title" id="previewTitle"></h2>
+            <img id="previewImage" src="" alt="" style="width: 100%; border-radius: 8px; margin-bottom: 20px;">
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeImageModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmationModal">
+        <div class="confirmation-modal">
+            <div class="confirmation-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 class="confirmation-title">Are you sure?</h2>
+            <p class="confirmation-message" id="confirmationMessage">This action cannot be undone.</p>
+            <div class="confirmation-actions">
+                <button class="btn btn-outline" onclick="closeConfirmationModal()">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let currentUploadType = '';
+        let pendingDeleteForm = null;
+        let pendingDeleteType = '';
+        
+        // ========== CONFIRMATION MODAL FUNCTIONS ==========
+        function confirmDelete(event, itemType) {
+            event.preventDefault();
+            pendingDeleteForm = event.target.closest('form');
+            pendingDeleteType = itemType;
+            
+            const message = `Are you sure you want to delete this ${itemType}? This action cannot be undone.`;
+            document.getElementById('confirmationMessage').textContent = message;
+            
+            showConfirmationModal();
+            return false;
+        }
+        
+        function showConfirmationModal() {
+            document.getElementById('confirmationModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+        
+        function closeConfirmationModal() {
+            document.getElementById('confirmationModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            pendingDeleteForm = null;
+            pendingDeleteType = '';
+        }
+        
+        function executeDelete() {
+            if (pendingDeleteForm) {
+                // Show loading state
+                const deleteBtn = document.getElementById('confirmDeleteBtn');
+                const originalText = deleteBtn.innerHTML;
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                deleteBtn.disabled = true;
+                
+                // Submit the form
+                pendingDeleteForm.submit();
+            }
+            closeConfirmationModal();
+        }
+        
+        // ========== MOBILE MENU TOGGLE ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarClose = document.querySelector('.sidebar-close');
+            const overlay = document.getElementById('overlay');
+
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
+                });
+            }
+
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                    closeUploadModal();
+                    closeImageModal();
+                    closeConfirmationModal();
+                });
+            }
+
+            // ========== USER DROPDOWN ==========
+            const userProfile = document.getElementById('userProfile');
+            const userDropdown = document.getElementById('userDropdown');
+
+            if (userProfile && userDropdown) {
+                userProfile.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('active');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!userProfile.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                    }
+                });
+            }
+
+            // ========== CONFIRM DELETE BUTTON ==========
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', executeDelete);
+            }
+
+            // ========== PROFILE EDIT FUNCTIONALITY ==========
+            // Edit About Section
+            const editAboutBtn = document.getElementById('editAboutBtn');
+            const aboutContent = document.getElementById('aboutContent');
+            const editAboutForm = document.getElementById('editAboutForm');
+            const cancelEditAbout = document.getElementById('cancelEditAbout');
+            
+            if (editAboutBtn && editAboutForm) {
+                editAboutBtn.addEventListener('click', function() {
+                    aboutContent.style.display = 'none';
+                    editAboutForm.classList.add('active');
+                    editAboutBtn.style.display = 'none';
+                });
+            }
+            
+            if (cancelEditAbout && editAboutForm) {
+                cancelEditAbout.addEventListener('click', function() {
+                    aboutContent.style.display = 'block';
+                    editAboutForm.classList.remove('active');
+                    editAboutBtn.style.display = 'flex';
+                });
+            }
+
+            // Add Experience
+            const addExperienceBtn = document.getElementById('addExperienceBtn');
+            const addExperienceForm = document.getElementById('addExperienceForm');
+            const cancelAddExperience = document.getElementById('cancelAddExperience');
+            const experienceForm = document.getElementById('experienceForm');
+            const experienceSubmitBtn = document.getElementById('experienceSubmitBtn');
+            
+            if (addExperienceBtn && addExperienceForm) {
+                addExperienceBtn.addEventListener('click', function() {
+                    resetExperienceForm();
+                    experienceSubmitBtn.textContent = 'Add Experience';
+                    experienceForm.action = "{% url 'add_employee_experience' %}";
+                    addExperienceForm.classList.add('active');
+                    addExperienceBtn.style.display = 'none';
+                });
+            }
+            
+            if (cancelAddExperience && addExperienceForm) {
+                cancelAddExperience.addEventListener('click', function() {
+                    addExperienceForm.classList.remove('active');
+                    addExperienceBtn.style.display = 'flex';
+                });
+            }
+
+            // Add Skill
+            const addNewSkillBtn = document.getElementById('addNewSkillBtn');
+            const addSkillForm = document.getElementById('addSkillForm');
+            const cancelAddSkill = document.getElementById('cancelAddSkill');
+            const addSkillBtn = document.getElementById('addSkillBtn');
+            
+            if (addNewSkillBtn && addSkillForm) {
+                addNewSkillBtn.addEventListener('click', function() {
+                    addSkillForm.classList.add('active');
+                    addNewSkillBtn.style.display = 'none';
+                });
+            }
+            
+            if (cancelAddSkill && addSkillForm) {
+                cancelAddSkill.addEventListener('click', function() {
+                    addSkillForm.classList.remove('active');
+                    addNewSkillBtn.style.display = 'flex';
+                });
+            }
+            
+            if (addSkillBtn && addSkillForm) {
+                addSkillBtn.addEventListener('click', function() {
+                    addSkillForm.classList.add('active');
+                    addSkillBtn.style.display = 'none';
+                });
+            }
+
+            // Edit Availability
+            const editAvailabilityBtn = document.getElementById('editAvailabilityBtn');
+            const editAvailabilityForm = document.getElementById('editAvailabilityForm');
+            const cancelEditAvailability = document.getElementById('cancelEditAvailability');
+            
+            if (editAvailabilityBtn && editAvailabilityForm) {
+                editAvailabilityBtn.addEventListener('click', function() {
+                    editAvailabilityForm.classList.add('active');
+                    editAvailabilityBtn.style.display = 'none';
+                });
+            }
+            
+            if (cancelEditAvailability && editAvailabilityForm) {
+                cancelEditAvailability.addEventListener('click', function() {
+                    editAvailabilityForm.classList.remove('active');
+                    editAvailabilityBtn.style.display = 'flex';
+                });
+            }
+
+            // ========== UPLOAD MODAL ==========
+            const uploadModal = document.getElementById('uploadModal');
+            const modalClose = document.getElementById('modalClose');
+            const uploadForm = document.getElementById('uploadForm');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const uploadHint = document.getElementById('uploadHint');
+            const certificateFields = document.getElementById('certificateFields');
+            const uploadTypeField = document.getElementById('uploadType');
+            const modalTitle = document.getElementById('modalTitle');
+            const uploadText = document.getElementById('uploadText');
+            const uploadIcon = document.getElementById('uploadIcon');
+            const titleLabel = document.getElementById('titleLabel');
+            const uploadTitle = document.getElementById('uploadTitle');
+
+            // Show upload modal
+            window.showUploadModal = function(type) {
+                currentUploadType = type;
+                
+                // Reset form
+                uploadForm.reset();
+                uploadTypeField.value = type;
+                fileInfo.style.display = 'none';
+                fileInput.value = '';
+                
+                // Update UI based on type
+                if (type === 'portfolio') {
+                    modalTitle.textContent = 'Upload Work Photo';
+                    uploadForm.action = "{% url 'add_employee_portfolio' %}";
+                    uploadHint.textContent = 'Supports JPG, PNG, GIF, WebP • Max 5MB';
+                    certificateFields.style.display = 'none';
+                    fileInput.setAttribute('accept', 'image/*');
+                    uploadTitle.setAttribute('name', 'title');
+                    uploadTitle.setAttribute('placeholder', 'Enter photo title');
+                    titleLabel.textContent = 'Photo Title *';
+                } else if (type === 'certificate') {
+                    modalTitle.textContent = 'Upload Certificate';
+                    uploadForm.action = "{% url 'add_employee_certificate' %}";
+                    uploadHint.textContent = 'Supports PDF, JPG, PNG • Max 10MB';
+                    certificateFields.style.display = 'block';
+                    fileInput.setAttribute('accept', '.pdf,image/*');
+                    uploadTitle.setAttribute('name', 'name');
+                    uploadTitle.setAttribute('placeholder', 'Enter certificate name');
+                    titleLabel.textContent = 'Certificate Name *';
+                }
+                
+                uploadModal.classList.add('active');
+                overlay.classList.add('active');
+            };
+
+            // Handle file selection
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                        const maxSize = currentUploadType === 'certificate' ? 10 : 5;
+                        
+                        // Validate file size
+                        if (sizeMB > maxSize) {
+                            alert(`File size exceeds ${maxSize}MB limit. Please choose a smaller file.`);
+                            fileInput.value = '';
+                            fileInfo.style.display = 'none';
+                            return;
+                        }
+                        
+                        // Validate file type
+                        if (currentUploadType === 'portfolio') {
+                            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+                            if (!allowedTypes.includes(file.type)) {
+                                alert('Only JPEG, PNG, JPG, GIF, and WebP images are allowed.');
+                                fileInput.value = '';
+                                fileInfo.style.display = 'none';
+                                return;
+                            }
+                        } else if (currentUploadType === 'certificate') {
+                            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+                            if (!allowedTypes.includes(file.type)) {
+                                alert('Only PDF, JPEG, PNG files are allowed.');
+                                fileInput.value = '';
+                                fileInfo.style.display = 'none';
+                                return;
+                            }
+                        }
+                        
+                        // Show file info
+                        fileName.textContent = file.name;
+                        fileSize.textContent = sizeMB;
+                        fileInfo.style.display = 'block';
+                        
+                        // Update upload area appearance
+                        uploadIcon.className = 'fas fa-check-circle';
+                        uploadIcon.style.color = '#06d6a0';
+                        uploadText.textContent = 'File selected';
+                    } else {
+                        // Reset upload area
+                        uploadIcon.className = 'fas fa-cloud-upload-alt';
+                        uploadIcon.style.color = '';
+                        uploadText.textContent = 'Click to select a file';
+                        fileInfo.style.display = 'none';
+                    }
+                });
+            }
+
+            // Close modal
+            window.closeUploadModal = function() {
+                uploadModal.classList.remove('active');
+                overlay.classList.remove('active');
+                uploadForm.reset();
+                fileInfo.style.display = 'none';
+                certificateFields.style.display = 'none';
+                uploadIcon.className = 'fas fa-cloud-upload-alt';
+                uploadIcon.style.color = '';
+                uploadText.textContent = 'Click to select a file';
+            };
+
+            if (modalClose) {
+                modalClose.addEventListener('click', closeUploadModal);
+            }
+
+            // Close modal when clicking outside
+            if (uploadModal) {
+                uploadModal.addEventListener('click', function(e) {
+                    if (e.target === uploadModal) {
+                        closeUploadModal();
+                    }
+                });
+            }
+
+            // Form validation
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', function(e) {
+                    // Check file is selected
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        e.preventDefault();
+                        alert('Please select a file to upload');
+                        return;
+                    }
+                    
+                    // Check title is entered
+                    const title = uploadTitle.value.trim();
+                    if (!title) {
+                        e.preventDefault();
+                        alert('Please enter a title');
+                        return;
+                    }
+                    
+                    // For certificates, check required fields
+                    if (currentUploadType === 'certificate') {
+                        const issuer = document.getElementById('uploadIssuer').value.trim();
+                        const issueDate = document.getElementById('uploadIssueDate').value;
+                        
+                        if (!issuer) {
+                            e.preventDefault();
+                            alert('Please enter the issuing organization');
+                            return;
+                        }
+                        
+                        if (!issueDate) {
+                            e.preventDefault();
+                            alert('Please select an issue date');
+                            return;
+                        }
+                    }
+                    
+                    // Show loading state
+                    const submitBtn = uploadForm.querySelector('.btn-primary');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+                    submitBtn.disabled = true;
+                    
+                    // Re-enable button after 5 seconds if submission fails
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }, 5000);
+                });
+            }
+
+            // ========== EXPERIENCE EDIT FUNCTION ==========
+            window.editExperience = function(event, id, jobTitle, company, startDate, endDate, currentlyWorking, description) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                document.getElementById('experienceId').value = id;
+                document.getElementById('jobTitle').value = jobTitle;
+                document.getElementById('company').value = company;
+                document.getElementById('startDate').value = startDate;
+                document.getElementById('endDate').value = endDate;
+                document.getElementById('currentlyWorking').checked = (currentlyWorking === 'True');
+                document.getElementById('experienceDescription').value = description;
+                
+                // Change form action and button text
+                experienceForm.action = "{% url 'update_employee_experience' 0 %}".replace('0', id);
+                experienceSubmitBtn.textContent = 'Update Experience';
+                
+                // Show the form
+                addExperienceForm.classList.add('active');
+                addExperienceBtn.style.display = 'none';
+                
+                // Scroll to form
+                addExperienceForm.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            // Reset experience form
+            function resetExperienceForm() {
+                document.getElementById('experienceId').value = '';
+                document.getElementById('jobTitle').value = '';
+                document.getElementById('company').value = '';
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                document.getElementById('currentlyWorking').checked = false;
+                document.getElementById('experienceDescription').value = '';
+                experienceForm.action = "{% url 'add_employee_experience' %}";
+                experienceSubmitBtn.textContent = 'Add Experience';
+            }
+
+            // ========== PORTFOLIO EDIT FUNCTION ==========
+            window.editPortfolioItem = function(event, id, title, description) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // For now, just show a message since we don't have edit form for portfolio
+                alert('Edit feature for portfolio items coming soon!');
+                // You can implement similar edit functionality as experience if needed
+            };
+
+            // ========== IMAGE PREVIEW ==========
+            window.showPortfolioImage = function(src, title) {
+                const modal = document.getElementById('imagePreviewModal');
+                const previewImage = document.getElementById('previewImage');
+                const previewTitle = document.getElementById('previewTitle');
+                
+                previewImage.src = src;
+                previewTitle.textContent = title;
+                modal.classList.add('active');
+                overlay.classList.add('active');
+            };
+
+            window.closeImageModal = function() {
+                const modal = document.getElementById('imagePreviewModal');
+                modal.classList.remove('active');
+                overlay.classList.remove('active');
+            };
+
+            // Auto-close messages after 5 seconds
+            setTimeout(function() {
+                const messages = document.querySelectorAll('.alert');
+                messages.forEach(function(message) {
+                    message.style.transition = 'opacity 0.5s ease';
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 500);
+                });
+            }, 5000);
+        });
+
+        // ========== WINDOW RESIZE ==========
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.getElementById('overlay');
+                if (sidebar) sidebar.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
+                closeUploadModal();
+                closeImageModal();
+                closeConfirmationModal();
+            }
+        });
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeUploadModal();
+                closeImageModal();
+                closeConfirmationModal();
+            }
+        });
+    </script>
+</body>
+</html>

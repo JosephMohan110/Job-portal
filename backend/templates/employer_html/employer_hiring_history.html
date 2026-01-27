@@ -1,0 +1,750 @@
+{% include 'employer_html/employer_header.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiring History - WorkNest</title>
+    <style>
+        /* Basic CSS - No JavaScript */
+        :root {
+            --primary: #4a6fff;
+            --primary-light: #e8eeff;
+            --primary-dark: #3a5fef;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            font-size: 2.2rem;
+            margin: 10px 0;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .card p {
+            color: var(--text-light);
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Card Variants with Gradients */
+        .card-1 {
+            border-bottom: 4px solid var(--primary);
+        }
+
+        .card-1 .icon-bg {
+            background: rgba(74, 111, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .card-2 {
+            border-bottom: 4px solid var(--success);
+        }
+
+        .card-2 .icon-bg {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+
+        .card-3 {
+            border-bottom: 4px solid var(--warning);
+        }
+
+        .card-3 .icon-bg {
+            background: rgba(255, 193, 7, 0.1);
+            color: #d39e00;
+        }
+
+        .card-4 {
+            border-bottom: 4px solid var(--info);
+        }
+
+        .card-4 .icon-bg {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--info);
+        }
+
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .icon-bg {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .card-trend {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .trend-neutral {
+            color: var(--text-light);
+        }
+
+        .search-section {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-section h2 {
+            margin: 0 0 10px 0;
+            color: var(--text-dark);
+        }
+
+        .search-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .search-input {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 20px;
+        }
+
+        .section-header h2 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-weight: 600;
+            background: var(--white);
+            color: var(--text-dark);
+            text-decoration: none;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .history-section {
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            background: var(--primary-light);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .history-table tr:hover {
+            background: var(--light);
+        }
+
+        .worker-info-small {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .worker-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-completed {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .status-ongoing {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .status-cancelled {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .status-upcoming {
+            background: var(--info);
+            color: var(--white);
+        }
+
+        .status-pending {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-xs {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pagination a {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .pagination .current {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .pagination a:hover {
+            background: var(--light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        .filter-tags {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tag {
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .filter-tag a {
+            color: var(--danger);
+            margin-left: 5px;
+            text-decoration: none;
+        }
+
+        .message-container {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .history-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-history"></i> Hiring History</h1>
+            <p>Track and manage all your past and current hiring activities</p>
+        </div>
+
+        <!-- Messages Display -->
+        <div class="message-container">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="dashboard-cards">
+            <!-- Total Hires Card -->
+            <div class="card card-1">
+                <div class="card-header-flex">
+                    <div class="icon-bg">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <p>Total Hires</p>
+                <h3>{{ total_hires }}</h3>
+                <div class="card-trend">
+                    {% if total_hires > 0 %}
+                    <i class="fas fa-arrow-up trend-up"></i>
+                    <span class="trend-neutral">active record</span>
+                    {% else %}
+                    <span class="trend-neutral">Start hiring today</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Completed Jobs Card -->
+            <div class="card card-2">
+                <div class="card-header-flex">
+                    <div class="icon-bg">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                </div>
+                <p>Completed Jobs</p>
+                <h3>{{ completed_jobs }}</h3>
+                <div class="card-trend">
+                    {% if completed_jobs > 0 %}
+                    <i class="fas fa-check-circle trend-up"></i>
+                    <span class="trend-up">{{ completion_rate|floatformat:0 }}% success rate</span>
+                    {% else %}
+                    <span class="trend-neutral">No completions yet</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Ongoing Jobs Card -->
+            <div class="card card-3">
+                <div class="card-header-flex">
+                    <div class="icon-bg">
+                        <i class="fas fa-hard-hat"></i>
+                    </div>
+                </div>
+                <p>Ongoing Jobs</p>
+                <h3>{{ ongoing_jobs }}</h3>
+                <div class="card-trend">
+                    {% if ongoing_jobs > 0 %}
+                    <span class="trend-neutral">{{ ongoing_jobs }} active now</span>
+                    {% else %}
+                    <span class="trend-neutral">No active jobs</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Total Spent Card -->
+            <div class="card card-4">
+                <div class="card-header-flex">
+                    <div class="icon-bg">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+                <p>Total Spent</p>
+                <h3>₹{{ total_spent }}</h3>
+                <div class="card-trend">
+                    {% if total_spent > 0 %}
+                    <i class="fas fa-coins trend-up"></i>
+                    <span class="trend-neutral">Invested in services</span>
+                    {% else %}
+                    <span class="trend-neutral">No spending yet</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Filters -->
+        {% if search_query or status_filter or category_filter %}
+        <div class="filter-tags">
+            <strong>Active Filters:</strong>
+            {% if search_query %}
+            <span class="filter-tag">
+                Search: "{{ search_query }}"
+                <a href="?status={{ status_filter }}&category={{ category_filter }}">&times;</a>
+            </span>
+            {% endif %}
+            {% if status_filter %}
+            <span class="filter-tag">
+                Status: {{ status_filter|title }}
+                <a href="?search={{ search_query }}&category={{ category_filter }}">&times;</a>
+            </span>
+            {% endif %}
+            {% if category_filter %}
+            <span class="filter-tag">
+                Category: {{ category_filter|title }}
+                <a href="?search={{ search_query }}&status={{ status_filter }}">&times;</a>
+            </span>
+            {% endif %}
+            <a href="{% url 'employer_hiring_history' %}" class="btn-xs">Clear All</a>
+        </div>
+        {% endif %}
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2>Filter Hiring History</h2>
+            <p>Search and filter your hiring records</p>
+            <form method="GET" action="{% url 'employer_hiring_history' %}" class="search-box">
+                <input type="text" name="search" class="search-input" placeholder="Search by worker name or job..."
+                    value="{{ search_query|default:'' }}">
+                
+                <!-- Status Filter Dropdown - CORRECTED -->
+                <select name="status" class="search-input">
+                    {% for status_value, status_label in status_choices %}
+                    <option value="{{ status_value }}" 
+                            {% if status_filter == status_value %}selected{% endif %}>
+                        {{ status_label }}
+                    </option>
+                    {% endfor %}
+                </select>
+                
+                <!-- Category Filter Dropdown - CORRECTED -->
+                <select name="category" class="search-input">
+                    {% for category_value, category_label in category_choices %}
+                    <option value="{{ category_value }}" 
+                            {% if category_filter == category_value %}selected{% endif %}>
+                        {{ category_label }}
+                    </option>
+                    {% endfor %}
+                </select>
+                
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+
+        <!-- Hiring History Section -->
+        <div class="section-header">
+            <h2>Your Hiring History</h2>
+            <div>
+                <a href="{% url 'export_hiring_history' %}?status={{ status_filter }}&category={{ category_filter }}&search={{ search_query }}"
+                    class="btn">
+                    <i class="fas fa-download"></i> Export CSV
+                </a>
+            </div>
+        </div>
+
+        <div class="history-section">
+            {% if hiring_records %}
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Worker</th>
+                        <th>Job Type</th>
+                        <th>Date</th>
+                        <th>Duration</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in hiring_records %}
+                    <tr>
+                        <td>
+                            <div class="worker-info-small">
+                                <div class="worker-avatar-small">
+                                    {{ record.employee_initials }}
+                                </div>
+                                <div>
+                                    <div>{{ record.employee.full_name|default:"Unknown Worker" }}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-light);">
+                                        {{ record.employee.job_title|default:"Worker" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ record.job_type }}</td>
+                        <td>{{ record.job_date }}</td>
+                        <td>{{ record.duration }}</td>
+                        <td>{{ record.amount }}</td>
+                        <td>
+                            <span class="status-badge 
+                                    {% if record.status == 'completed' %}status-completed
+                                    {% elif record.status == 'accepted' %}status-ongoing
+                                    {% elif record.status == 'in_progress' %}status-ongoing
+                                    {% elif record.status == 'cancelled' %}status-cancelled
+                                    {% elif record.status == 'upcoming' %}status-upcoming
+                                    {% else %}status-pending{% endif %}">
+                                {{ record.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'view_job_details' record.id %}" class="btn btn-xs">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                                {% if record.status == 'completed' and not record.has_rating %}
+                                <a href="{% url 'view_job_details' record.id %}" class="btn btn-xs"
+                                    style="background: var(--primary); color: white;">
+                                    <i class="fas fa-star"></i> Add Review
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>No Hiring Records Found</h3>
+                <p>
+                    {% if search_query or status_filter or category_filter %}
+                    Try changing your search criteria or
+                    <a href="{% url 'employer_hiring_history' %}">clear all filters</a>
+                    {% else %}
+                    You haven't hired any workers yet.
+                    <a href="{% url 'employer_find_workers' %}">Find workers</a> to get started.
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Pagination - Simplified without paginator object -->
+        {% if total_hires > 20 %}
+        <div class="pagination">
+            <span class="current">Page 1</span>
+            <a href="#" style="pointer-events: none; color: #ccc;">Next</a>
+        </div>
+        {% endif %}
+
+        <!-- Summary Section
+        <div class="card" style="margin-top: 30px;">
+            <h3>Hiring Summary</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 15px;">
+                <div>
+                    <p><strong>Total Workers Hired:</strong> {{ total_hires }}</p>
+                    <p><strong>Completion Rate:</strong>
+                        {% if total_hires > 0 %}
+                        {{ completion_rate|floatformat:0 }}%
+                        {% else %}
+                        0%
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <p><strong>Most Hired Category:</strong>
+                        {% if total_hires > 0 %}
+                        {{ most_hired_category|default:"N/A" }}
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </p>
+                    <p><strong>Average Job Cost:</strong>
+                        {% if completed_jobs > 0 %}
+                        ₹{{ avg_job_cost|floatformat:0|default:"0" }}
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <p><strong>Current Active Jobs:</strong> {{ ongoing_jobs }}</p>
+                    <p><strong>Total Investment:</strong> ₹{{ total_spent }}</p>
+                </div>
+            </div>
+        </div> -->
+    </main>
+</body>
+
+</html>

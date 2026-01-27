@@ -1,0 +1,707 @@
+<style>
+    /* CSS Variables (required) */
+    :root {
+        --primary: #3a86ff;
+        --primary-light: #e6f0ff;
+        --primary-dark: #2667cc;
+        --danger: #ef476f;
+        --warning: #ffd166;
+        --success: #06d6a0;
+        --info: #118ab2;
+        --white: #ffffff;
+        --gray: #6c757d;
+        --gray-light: #e9ecef;
+        --dark: #212529;
+        --text-light: #6c757d;
+        --border-color: #dee2e6;
+        --shadow: rgba(0, 0, 0, 0.08);
+        --shadow-lg: rgba(0, 0, 0, 0.15);
+    }
+
+    /* User Actions Container */
+    .user-actions {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    /* Notification Icon */
+    .notification-icon {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .notification-icon i {
+        font-size: 1.3rem;
+        color: var(--gray);
+        transition: color 0.3s;
+    }
+
+    .notification-icon:hover i {
+        color: var(--primary);
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: var(--danger);
+        color: var(--white);
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        z-index: 1001;
+    }
+
+    /* Notification Dropdown */
+    .notification-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--white);
+        width: 400px;
+        max-height: 500px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px var(--shadow-lg);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .notification-icon:focus-within .notification-dropdown,
+    .notification-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .notification-dropdown::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        right: 25px;
+        width: 16px;
+        height: 16px;
+        background: var(--white);
+        transform: rotate(45deg);
+        border-top: 1px solid var(--border-color);
+        border-left: 1px solid var(--border-color);
+    }
+
+    /* Notification Header */
+    .notification-header {
+        padding: 1.2rem 1.5rem;
+        border-bottom: 2px solid var(--primary-light);
+        background: var(--white);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .notification-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .mark-all-read {
+        background: var(--primary);
+        color: var(--white);
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+
+    .mark-all-read:hover {
+        background: var(--primary-dark);
+    }
+
+    .view-all {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .view-all:hover {
+        text-decoration: underline;
+    }
+
+    /* Notification List */
+    .notification-list {
+        flex: 1;
+        overflow-y: auto;
+        max-height: 350px;
+        padding: 5px 0;
+    }
+
+    /* Notification Item */
+    .notification-item {
+        display: flex;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: all 0.3s;
+        position: relative;
+        gap: 15px;
+        cursor: pointer;
+    }
+
+    .notification-item:hover {
+        background: var(--primary-light);
+    }
+
+    .notification-item.unread {
+        background: var(--primary-light);
+        border-left: 4px solid var(--primary);
+    }
+
+    /* Notification Icon */
+    .notification-item-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1.1rem;
+    }
+
+    .notification-item.job_request .notification-item-icon {
+        background: rgba(58, 134, 255, 0.1);
+        color: var(--primary);
+    }
+
+    .notification-item.job_accepted .notification-item-icon {
+        background: rgba(6, 214, 160, 0.1);
+        color: var(--success);
+    }
+
+    .notification-item.job_rejected .notification-item-icon {
+        background: rgba(239, 71, 111, 0.1);
+        color: var(--danger);
+    }
+
+    .notification-item.job_completed .notification-item-icon {
+        background: rgba(255, 209, 102, 0.1);
+        color: var(--warning);
+    }
+
+    .notification-item.payment_received .notification-item-icon {
+        background: rgba(17, 138, 178, 0.1);
+        color: var(--info);
+    }
+
+    .notification-item.review_received .notification-item-icon {
+        background: rgba(147, 51, 234, 0.1);
+        color: #9333ea;
+    }
+
+    /* Notification Content */
+    .notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .notification-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 5px;
+    }
+
+    .notification-title h4 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--dark);
+        line-height: 1.4;
+    }
+
+    .notification-time {
+        font-size: 0.75rem;
+        color: var(--text-light);
+        white-space: nowrap;
+        margin-left: 10px;
+    }
+
+    .notification-message {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--text-light);
+        line-height: 1.5;
+        margin-bottom: 8px;
+    }
+
+    .notification-actions-item {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .notification-action-btn {
+        display: inline-block;
+        padding: 4px 12px;
+        background: var(--white);
+        color: var(--primary);
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s;
+    }
+
+    .notification-action-btn:hover {
+        background: var(--primary);
+        color: var(--white);
+        border-color: var(--primary);
+    }
+
+    .mark-read-btn {
+        background: transparent;
+        color: var(--gray);
+        border: 1px solid var(--border-color);
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+    .mark-read-btn:hover {
+        background: var(--gray-light);
+        color: var(--dark);
+    }
+
+    /* Unread Dot */
+    .unread-dot {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 8px;
+        height: 8px;
+        background: var(--primary);
+        border-radius: 50%;
+    }
+
+    /* No Notifications */
+    .no-notifications {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-light);
+    }
+
+    .no-notifications i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--gray-light);
+    }
+
+    .no-notifications h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+        color: var(--dark);
+    }
+
+    .no-notifications p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Notification Footer */
+    .notification-footer {
+        padding: 1rem 1.5rem;
+        border-top: 2px solid var(--primary-light);
+        background: var(--white);
+        text-align: center;
+    }
+
+    .notification-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .notification-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* User Profile Styles (existing) */
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: background 0.3s;
+        position: relative;
+    }
+
+    .user-profile:hover {
+        background: var(--gray-light);
+    }
+
+    /* Avatar */
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: var(--white);
+        font-size: 1.1rem;
+        overflow: hidden;
+    }
+
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* User Info */
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .user-role {
+        font-size: 0.8rem;
+        color: var(--text-light);
+    }
+
+    /* Dropdown */
+    .user-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--white);
+        width: 220px;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+    }
+
+    .user-profile:focus-within .user-dropdown,
+    .user-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .user-dropdown::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        right: 20px;
+        width: 16px;
+        height: 16px;
+        background: var(--white);
+        transform: rotate(45deg);
+        border-top: 1px solid var(--border-color);
+        border-left: 1px solid var(--border-color);
+    }
+
+    /* Dropdown Header */
+    .dropdown-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .dropdown-header .user-avatar {
+        width: 45px;
+        height: 45px;
+    }
+
+    .dropdown-header .user-info .user-name {
+        font-size: 1rem;
+    }
+
+    .user-email {
+        font-size: 0.8rem;
+        color: var(--text-light);
+    }
+
+    /* Dropdown Menu */
+    .dropdown-menu {
+        list-style: none;
+        padding: 0.5rem 0;
+    }
+
+    .dropdown-menu a {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: var(--dark);
+        text-decoration: none;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .dropdown-menu a:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .dropdown-menu i {
+        margin-right: 10px;
+        width: 18px;
+        text-align: center;
+        color: var(--gray);
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 0.5rem 0;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .notification-dropdown {
+            width: 320px;
+            right: -50px;
+        }
+
+        .notification-dropdown::before {
+            right: 70px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .notification-dropdown {
+            width: 280px;
+            right: -80px;
+        }
+
+        .notification-dropdown::before {
+            right: 100px;
+        }
+
+        .user-info {
+            display: none;
+        }
+    }
+
+    /* Focus styles for accessibility */
+    .notification-icon:focus,
+    .user-profile:focus {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+</style>
+
+<div class="user-actions">
+    <!-- Notification Icon with Dropdown -->
+    <div class="notification-icon" tabindex="0">
+        <i class="fas fa-bell"></i>
+        {% if unread_notifications_count > 0 %}
+        <span class="notification-badge">{{ unread_notifications_count }}</span>
+        {% endif %}
+
+        <!-- Notification Dropdown -->
+        <div class="notification-dropdown">
+            <div class="notification-header">
+                <h3>Notifications</h3>
+                <div class="notification-actions">
+                    {% if unread_notifications_count > 0 %}
+                    <form method="POST" action="{% url 'mark_all_notifications_read' %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="mark-all-read">Mark all read</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="notification-list">
+                {% if recent_notifications %}
+                {% for notification in recent_notifications %}
+                <div class="notification-item {{ notification.notification_type }} {% if not notification.is_read %}unread{% endif %}"
+                    tabindex="0">
+                    <div class="notification-item-icon">
+                        {% if notification.notification_type == 'job_request' %}
+                        <i class="fas fa-briefcase"></i>
+                        {% elif notification.notification_type == 'job_accepted' %}
+                        <i class="fas fa-check-circle"></i>
+                        {% elif notification.notification_type == 'job_rejected' %}
+                        <i class="fas fa-times-circle"></i>
+                        {% elif notification.notification_type == 'job_completed' %}
+                        <i class="fas fa-check-double"></i>
+                        {% elif notification.notification_type == 'payment_received' %}
+                        <i class="fas fa-rupee-sign"></i>
+                        {% elif notification.notification_type == 'review_received' %}
+                        <i class="fas fa-star"></i>
+                        {% elif notification.notification_type == 'system' %}
+                        <i class="fas fa-info-circle"></i>
+                        {% elif notification.notification_type == 'warning' %}
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {% elif notification.notification_type == 'reminder' %}
+                        <i class="fas fa-clock"></i>
+                        {% else %}
+                        <i class="fas fa-bell"></i>
+                        {% endif %}
+                    </div>
+
+                    <div class="notification-content">
+                        <div class="notification-title">
+                            <h4>{{ notification.title }}</h4>
+                            <span class="notification-time">{{ notification.created_at|timesince }} ago</span>
+                        </div>
+                        <p class="notification-message">{{ notification.message|truncatechars:80 }}</p>
+                        <div class="notification-actions-item">
+                            {% if notification.link %}
+                            <a href="{{ notification.link }}" class="notification-action-btn">
+                                View Details
+                            </a>
+                            {% endif %}
+
+                            {% if not notification.is_read %}
+                            <form method="POST" action="{% url 'mark_notification_read' notification.notification_id %}"
+                                style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="mark-read-btn">Mark as read</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if not notification.is_read %}
+                    <span class="unread-dot"></span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="no-notifications">
+                    <i class="fas fa-bell-slash"></i>
+                    <h4>No notifications</h4>
+                    <p>When you get notifications, they'll appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="notification-footer" style="display:none;">
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile -->
+    <div class="user-profile" id="userProfile" tabindex="0">
+        <div class="user-avatar">
+            {% if employee.profile_image %}
+            <img src="{{ employee.profile_image.url }}" alt="{{ employee.full_name }}">
+            {% else %}
+            {{ employee.first_name|first }}{{ employee.last_name|first }}
+            {% endif %}
+        </div>
+        <div class="user-info">
+            <div class="user-name">{{ employee.full_name }}</div>
+            <div class="user-role">{{ employee.job_title|default:"Service Provider" }}</div>
+        </div>
+        <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-dropdown" id="userDropdown">
+            <div class="dropdown-header">
+                <div class="user-avatar">
+                    {% if employee.profile_image %}
+                    <img src="{{ employee.profile_image.url }}" alt="{{ employee.full_name }}">
+                    {% else %}
+                    {{ employee.first_name|first }}{{ employee.last_name|first }}
+                    {% endif %}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">{{ employee.full_name }}</div>
+                    <div class="user-email">{{ employee.email }}</div>
+                </div>
+            </div>
+            <ul class="dropdown-menu">
+                <li><a href="{% url 'employee_profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                <li><a href="{% url 'employee_setting' %}"><i class="fas fa-cog"></i> Account Settings</a></li>
+                <!-- Notification link removed as page is deleted -->
+                <li><a href="#"><i class="fas fa-lock"></i> Privacy & Security</a></li>
+                <div class="dropdown-divider"></div>
+                <li><a href="#"><i class="fas fa-question-circle"></i> Help & Support</a></li>
+                <li><a href="#"><i class="fas fa-info-circle"></i> About WorkNest</a></li>
+                <div class="dropdown-divider"></div>
+                <li><a href="{% url 'logout' %}" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const notificationIcon = document.querySelector('.notification-icon');
+        const notificationDropdown = document.querySelector('.notification-dropdown');
+
+        if (notificationIcon && notificationDropdown) {
+            notificationIcon.addEventListener('click', function (e) {
+                // If clicking inside the dropdown content (e.g. links, buttons), don't toggle or prevent default
+                if (notificationDropdown.contains(e.target)) {
+                    return;
+                }
+
+                e.preventDefault(); // Prevent default link behavior if it's a link
+                e.stopPropagation();
+                notificationDropdown.classList.toggle('active');
+
+                // Also toggle the active class on the icon itself for styling if needed
+                notificationIcon.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!notificationIcon.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.remove('active');
+                    notificationIcon.classList.remove('active');
+                }
+            });
+        }
+    });
+</script>

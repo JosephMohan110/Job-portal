@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews - WorkNest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #3a86ff;
+            --primary-light: #e6f0ff;
+            --primary-dark: #1a5fd8;
+            --secondary: #8338ec;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+            --card-bg: #ffffff;
+            --sidebar-bg: #1a2238;
+            --sidebar-text: #b0b7c3;
+            --sidebar-active: #3a86ff;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 0;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .page-title p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            position: relative;
+        }
+
+        .notification-icon i {
+            font-size: 1.3rem;
+            color: var(--gray);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .user-profile:hover {
+            background: var(--gray-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+            font-size: 1.1rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex: 1;
+        }
+
+        /* Review Stats */
+        .review-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .stat-info p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .bg-blue {
+            background: var(--primary);
+        }
+
+        .bg-green {
+            background: var(--success);
+        }
+
+        .bg-orange {
+            background: var(--warning);
+        }
+
+        /* Rating Display */
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .rating-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .rating-star {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .rating-count {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-left: 8px;
+        }
+
+        /* Reviews Summary */
+        .reviews-summary-container {
+            background: linear-gradient(135deg, var(--white) 0%, var(--primary-light) 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(58, 134, 255, 0.15);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(58, 134, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .summary-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Rating Distribution */
+        .rating-distribution {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 500px;
+        }
+
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .rating-label {
+            min-width: 70px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .rating-progress {
+            flex: 1;
+            height: 12px;
+            background: var(--gray-light);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .rating-fill {
+            height: 100%;
+            border-radius: 6px;
+        }
+
+        .rating-count {
+            min-width: 60px;
+            text-align: right;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Search and Filter Bar */
+        .search-filter-bar {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .filter-dropdown {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2.5rem 0 1.5rem;
+        }
+
+        .section-header h2 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 8px;
+            background: var(--white);
+            padding: 6px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px var(--shadow);
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+        }
+
+        /* Reviews List */
+        .reviews-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .review-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+
+        .review-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--shadow-lg);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .reviewer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+            font-size: 1.2rem;
+        }
+
+        .reviewer-details h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .reviewer-details p {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .review-date {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .review-star {
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+
+        .review-rating-value {
+            font-weight: 600;
+            color: var(--dark);
+            margin-left: 8px;
+        }
+
+        .review-content {
+            margin-bottom: 1.5rem;
+        }
+
+        .review-text {
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+
+        .review-job-info {
+            display: flex;
+            gap: 20px;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .job-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        /* Sentiment Badge */
+        .sentiment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .sentiment-positive {
+            background: rgba(6, 214, 160, 0.15);
+            color: #06a079;
+            border: 1px solid rgba(6, 214, 160, 0.3);
+        }
+
+        .sentiment-neutral {
+            background: rgba(255, 209, 102, 0.15);
+            color: #b38900;
+            border: 1px solid rgba(255, 209, 102, 0.3);
+        }
+
+        .sentiment-negative {
+            background: rgba(239, 71, 111, 0.15);
+            color: #c92a4c;
+            border: 1px solid rgba(239, 71, 111, 0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--gray-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-light);
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            font-size: 1rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 134, 255, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-light);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .pagination-btn.active,
+        .pagination-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Footer Area */
+        .footer-area {
+            margin-top: auto;
+            padding-top: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .review-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+            }
+
+            .review-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .filter-options {
+                align-self: flex-start;
+            }
+
+            .search-filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .filter-dropdown {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .review-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .top-bar {
+                padding: 1rem;
+            }
+
+            .dashboard-content {
+                padding: 1.5rem;
+            }
+
+            .stat-card {
+                padding: 1.2rem;
+            }
+
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+
+            .stat-info h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* New Styles for Tabs and Feedback Form */
+        .tabs-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 2rem;
+            background: var(--white);
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+
+        .tab-btn:hover {
+            background: var(--gray-light);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Feedback Form Styles */
+        .feedback-form-container {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-section-header h3 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-section-header p {
+            color: var(--text-light);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: var(--danger);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Interactive Rating Stars */
+        .rating-input-container {
+            display: flex;
+            gap: 10px;
+            background: var(--gray-light);
+            padding: 15px;
+            border-radius: 12px;
+            justify-content: center;
+        }
+
+        .rating-star-input {
+            font-size: 2rem;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .rating-star-input:hover,
+        .rating-star-input.active {
+            color: #ffd700;
+            transform: scale(1.1);
+        }
+
+        /* Card Options for Recommendation */
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-label {
+            flex: 1;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .radio-label input {
+            display: none;
+        }
+
+        .radio-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .radio-label input:checked+.radio-content {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .radio-label:hover .radio-content {
+            border-color: var(--primary);
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .review-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .review-job-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filter-options {
+                flex-wrap: wrap;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .user-info {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .top-bar {
+                padding: 0.8rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .stat-info h3 {
+                font-size: 1.5rem;
+                margin-bottom: 2px;
+            }
+
+            .stat-info p {
+                font-size: 0.8rem;
+            }
+
+            .reviewer-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'employee_html/employee_header.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="page-title">
+                <h1>REVIEWS</h1>
+                <p>See what employers are saying about your work</p>
+            </div>
+            {% include 'employee_html/employee_dropdown.html' %}
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Tabs Nav -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="tab-reviews"><i class="fas fa-list"></i> My Reviews</button>
+                <button class="tab-btn" data-tab="tab-feedback"><i class="fas fa-comment-alt"></i> Site
+                    Feedback</button>
+            </div>
+
+            <!-- Tab 1: My Reviews -->
+            <div id="tab-reviews" class="tab-content active">
+                <div class="content-wrapper">
+                    <!-- Review Stats -->
+                    <div class="review-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-blue">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="rating-display">
+                                    <span class="rating-value">{{ avg_rating|floatformat:1 }}</span>
+                                    <div class="rating-stars">
+                                        {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= avg_rating|floatformat:"0" %} <i
+                                            class="fas fa-star rating-star"></i>
+                                            {% elif forloop.counter <= avg_rating|add:0.5|floatformat:"0" %} <i
+                                                class="fas fa-star-half-alt rating-star"></i>
+                                                {% else %}
+                                                <i class="far fa-star rating-star"></i>
+                                                {% endif %}
+                                                {% endfor %}
+                                    </div>
+                                </div>
+                                <p>Average Rating</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon bg-green">
+                                <i class="fas fa-comment-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>{{ total_reviews }}</h3>
+                                <p>Total Reviews</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon bg-orange">
+                                <i class="fas fa-thumbs-up"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>{{ positive_percentage|floatformat:0 }}%</h3>
+                                <p>Positive Reviews</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Summary -->
+                    <div class="reviews-summary-container">
+                        <div class="summary-header">
+                            <div class="summary-title">Rating Distribution</div>
+                        </div>
+                        <div class="rating-distribution">
+                            {% for stars, count in rating_distribution.items %}
+                            {% with stars_int=stars|add:0 %}
+                            {% if total_reviews > 0 %}
+                            {% widthratio count total_reviews 100 as percentage %}
+                            {% else %}
+                            {% widthratio 0 1 100 as percentage %}
+                            {% endif %}
+                            <div class="rating-bar">
+                                <span class="rating-label">{{ stars }} Stars</span>
+                                <div class="rating-progress">
+                                    <div class="rating-fill" style="width: {{ percentage }}%; 
+                                            {% if stars_int == 5 %}background: var(--primary);
+                                            {% elif stars_int == 4 %}background: var(--success);
+                                            {% elif stars_int == 3 %}background: var(--warning);
+                                            {% elif stars_int == 2 %}background: #ff6b6b;
+                                            {% else %}background: var(--danger);{% endif %}">
+                                    </div>
+                                </div>
+                                <span class="rating-count">{{ count }} reviews</span>
+                            </div>
+                            {% endwith %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Search and Filter Bar -->
+                    <form method="GET" action="{% url 'employee_review_list' %}" class="search-filter-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" name="search" placeholder="Search reviews by employer name or job..."
+                                value="{{ search_query|default:'' }}">
+                        </div>
+
+                        <select name="rating" class="filter-dropdown">
+                            <option value="all" {% if not rating_filter or rating_filter == 'all' %}selected{% endif %}>
+                                All
+                                Ratings</option>
+                            <option value="5" {% if rating_filter == '5' %}selected{% endif %}>5 Stars</option>
+                            <option value="4" {% if rating_filter == '4' %}selected{% endif %}>4 Stars</option>
+                            <option value="3" {% if rating_filter == '3' %}selected{% endif %}>3 Stars</option>
+                            <option value="2" {% if rating_filter == '2' %}selected{% endif %}>2 Stars</option>
+                            <option value="1" {% if rating_filter == '1' %}selected{% endif %}>1 Star</option>
+                        </select>
+
+                        <select name="date_filter" class="filter-dropdown">
+                            <option value="" {% if not date_filter %}selected{% endif %}>All Time</option>
+                            <option value="month" {% if date_filter == 'month' %}selected{% endif %}>Last Month</option>
+                            <option value="3months" {% if date_filter == '3months' %}selected{% endif %}>Last 3 Months
+                            </option>
+                            <option value="year" {% if date_filter == 'year' %}selected{% endif %}>Last Year</option>
+                        </select>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+
+                        {% if search_query or rating_filter or date_filter %}
+                        <a href="{% url 'employee_review_list' %}" class="btn btn-outline">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </a>
+                        {% endif %}
+                    </form>
+
+                    <!-- Section Header -->
+                    <div class="section-header">
+                        <h2>All Reviews ({{ reviews|length }})</h2>
+                    </div>
+
+                    <!-- Reviews List -->
+                    <div class="reviews-container">
+                        {% if reviews %}
+                        {% for review in reviews %}
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-avatar">
+                                        {% if review.employer %}
+                                        {{ review.employer.first_name|slice:":1" }}{{
+                                        review.employer.last_name|slice:":1"
+                                        }}
+                                        {% else %}
+                                        EE
+                                        {% endif %}
+                                    </div>
+                                    <div class="reviewer-details">
+                                        <h4>
+                                            {% if review.employer %}
+                                            {{ review.employer.first_name }} {{ review.employer.last_name }}
+                                            {% if review.employer.company_name %}
+                                            - {{ review.employer.company_name }}
+                                            {% endif %}
+                                            {% else %}
+                                            Employer
+                                            {% endif %}
+                                            <span class="sentiment-badge 
+                                                    {% if review.sentiment_category == 'positive' %}sentiment-positive
+                                                    {% elif review.sentiment_category == 'neutral' %}sentiment-neutral
+                                                    {% else %}sentiment-negative{% endif %}">
+                                                <i class="fas fa-{% if review.sentiment_category == 'positive' %}smile
+                                                                     {% elif review.sentiment_category == 'neutral' %}meh
+                                                                     {% else %}frown{% endif %}"></i>
+                                                {{ review.sentiment_category|title }}
+                                            </span>
+                                        </h4>
+                                        <p>Employer • Sentiment Score: {{ review.sentiment|floatformat:2 }}</p>
+                                    </div>
+                                </div>
+                                <div class="review-date">{{ review.created_at|date:"d M Y" }}</div>
+                            </div>
+
+                            <div class="review-rating">
+                                {% if review.rating %}
+                                {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= review.rating|floatformat:"0" %} <i
+                                    class="fas fa-star review-star"></i>
+                                    {% else %}
+                                    <i class="far fa-star review-star"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <span class="review-rating-value">{{ review.rating|floatformat:1 }}</span>
+                                    {% else %}
+                                    <span style="color: var(--text-light); font-style: italic;">No rating
+                                        provided</span>
+                                    {% endif %}
+                            </div>
+
+                            <div class="review-content">
+                                <p class="review-text">{{ review.text|linebreaksbr }}</p>
+                            </div>
+
+                            {% if review.job %}
+                            <div class="review-job-info">
+                                <div class="job-detail">
+                                    <span class="detail-label">Job:</span>
+                                    <span class="detail-value">{{ review.job.title }}</span>
+                                </div>
+                                <div class="job-detail">
+                                    <span class="detail-label">Date:</span>
+                                    <span class="detail-value">{{ review.job.proposed_date|date:"d M Y" }}</span>
+                                </div>
+                                {% if review.job.budget %}
+                                <div class="job-detail">
+                                    <span class="detail-label">Amount:</span>
+                                    <span class="detail-value">₹{{ review.job.budget|floatformat:2 }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="far fa-comment-alt"></i>
+                            <h3>No Reviews Yet</h3>
+                            <p>You haven't received any reviews from employers yet. Complete more jobs to start
+                                receiving
+                                feedback!</p>
+                            <a href="{% url 'employee_job_request' %}" class="btn btn-primary">
+                                <i class="fas fa-briefcase"></i> View Job Requests
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Footer Area -->
+                    <div class="footer-area">
+                        <div style="text-align: center; color: var(--text-light); font-size: 0.9rem; padding: 1rem;">
+                            {% if reviews %}
+                            Showing {{ reviews|length }} of {{ total_reviews }} reviews
+                            {% else %}
+                            No reviews to display
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tab 2: Site Feedback Form -->
+            <div id="tab-feedback" class="tab-content">
+                <div class="feedback-form-container">
+                    <div class="form-section-header">
+                        <h3><i class="fas fa-globe"></i> Share Your Feedback</h3>
+                        <p>Tell us about your experience with WorkNest. Your feedback helps us improve.</p>
+                    </div>
+
+                    {% if messages %}
+                    {% for message in messages %}
+                    {% if 'site_feedback' in message.tags %}
+                    <div class="{% if 'danger' in message.tags %}alert-danger{% else %}alert-success{% endif %}">
+                        <i
+                            class="fas fa-{% if 'danger' in message.tags %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'submit_employee_site_feedback' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="feedback_type" value="general_feedback">
+
+                        <div class="form-group">
+                            <label class="form-label required">Overall Experience</label>
+                            <div class="rating-input-container">
+                                <i class="fas fa-star rating-star-input" data-value="1"></i>
+                                <i class="fas fa-star rating-star-input" data-value="2"></i>
+                                <i class="fas fa-star rating-star-input" data-value="3"></i>
+                                <i class="fas fa-star rating-star-input" data-value="4"></i>
+                                <i class="fas fa-star rating-star-input" data-value="5"></i>
+                            </div>
+                            <input type="hidden" name="rating" id="feedback-rating" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required">Feedback Title</label>
+                            <input type="text" name="title" class="form-control"
+                                placeholder="Brief summary of your feedback" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required">Your Feedback</label>
+                            <textarea name="feedback_text" class="form-control"
+                                placeholder="What do you like? What can we improve?" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required">Would you recommend WorkNest?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="recommendation" value="yes" required>
+                                    <div class="radio-content"><i class="fas fa-thumbs-up"></i> Yes</div>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="recommendation" value="maybe">
+                                    <div class="radio-content"><i class="fas fa-hand-paper"></i> Maybe</div>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="recommendation" value="no">
+                                    <div class="radio-content"><i class="fas fa-thumbs-down"></i> No</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary"
+                                style="padding: 14px 40px; font-size: 1.1rem;">
+                                <i class="fas fa-paper-plane"></i> Submit Feedback
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple function to handle filter button clicks
+        document.addEventListener('DOMContentLoaded', function () {
+            // Tab Switching
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    button.classList.add('active');
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Feedback Rating
+            const ratingStars = document.querySelectorAll('.rating-star-input');
+            const ratingInput = document.getElementById('feedback-rating');
+
+            ratingStars.forEach(star => {
+                star.addEventListener('click', function () {
+                    const value = this.getAttribute('data-value');
+                    ratingInput.value = value;
+                    // Update visual state
+                    ratingStars.forEach(s => {
+                        const sValue = s.getAttribute('data-value');
+                        if (sValue <= value) {
+                            s.classList.add('active');
+                            s.classList.add('text-warning');
+                            s.style.color = '#ffd700';
+                        } else {
+                            s.classList.remove('active');
+                            s.classList.remove('text-warning');
+                            s.style.color = '#d1d5db';
+                        }
+                    });
+                });
+            });
+            const filterBtns = document.querySelectorAll('.filter-btn');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // In a real implementation, this would trigger filtering
+                    // For now, it's just visual feedback
+                });
+            });
+
+            // Auto-submit filter dropdowns on change
+            const filterDropdowns = document.querySelectorAll('.filter-dropdown');
+            filterDropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', function () {
+                    this.form.submit();
+                });
+            });
+
+            // Auto-submit search when Enter is pressed
+            const searchInput = document.querySelector('.search-box input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        this.form.submit();
+                    }
+                });
+            }
+
+            // Add fade-in animation for review cards
+            const reviewCards = document.querySelectorAll('.review-card');
+            reviewCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Check for tab parameter and activate
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('tab') === 'feedback') {
+                const feedbackBtn = document.querySelector('.tab-btn[data-tab="tab-feedback"]');
+                if (feedbackBtn) feedbackBtn.click();
+            }
+        });
+    </script>
+</body>
+
+</html>

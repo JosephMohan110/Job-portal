@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillConnect | Revenue Analytics & Payouts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --sidebar-bg: #1e293b;
+            --sidebar-dark: #0f172a;
+            --sidebar-light: #334155;
+            --sidebar-text: #e2e8f0;
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+            --sidebar-border: #475569;
+
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --warning-color: #f97316;
+            --success-color: #10b981;
+            --info-color: #06b6d4;
+            --purple-color: #8b5cf6;
+
+            --card-bg: #ffffff;
+            --body-bg: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ---------- MOBILE HEADER ---------- */
+        .mobile-header {
+            display: none;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 70px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            padding: 0 16px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: var(--sidebar-text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .menu-toggle:hover {
+            background-color: var(--sidebar-hover);
+        }
+
+        .mobile-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .mobile-logo-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .mobile-notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            color: var(--sidebar-text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 2px solid var(--sidebar-bg);
+        }
+
+        /* ---------- SIDEBAR ---------- */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--sidebar-dark) 0%, var(--sidebar-bg) 100%);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: fixed;
+            padding-top: 0;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-container {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+            padding: 0 20px;
+            margin-bottom: 12px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 4px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.15);
+        }
+
+        .nav-item.active .nav-link {
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 40%;
+            background-color: var(--sidebar-active);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: var(--sidebar-hover);
+        }
+
+        .nav-link {
+            color: var(--sidebar-text);
+            text-decoration: none;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-item.active .nav-icon {
+            color: var(--sidebar-active);
+            opacity: 1;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--sidebar-border);
+            position: relative;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .user-profile:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            right: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            overflow: hidden;
+            display: none;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            color: #666;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: #e5e5e5;
+            margin: 4px 0;
+        }
+
+        .logout-item {
+            color: #dc3545;
+        }
+
+        .logout-item i {
+            color: #dc3545;
+        }
+
+        /* ---------- MAIN CONTENT ---------- */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 24px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            width: 100%;
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-title p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #0da271;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #ea580c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .btn-payout {
+            background: linear-gradient(135deg, var(--purple-color), #7c3aed);
+            color: white;
+        }
+
+        .btn-payout:hover {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background-color: #f1f5f9;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background-color: #f1f5f9;
+            transition: all 0.2s ease;
+        }
+
+        .admin-profile:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .admin-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        /* ---------- REVENUE ANALYTICS SECTION ---------- */
+        .analytics-section {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Date Range Selector */
+        .date-range-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .date-range-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background-color: white;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .date-range-btn:hover {
+            background-color: #f1f5f9;
+            border-color: var(--primary-color);
+        }
+
+        .date-range-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .date-picker {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background-color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        /* Revenue Stats */
+        .revenue-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+        }
+
+        .stat-card:nth-child(2)::before {
+            background: linear-gradient(90deg, var(--success-color), #22c55e);
+        }
+
+        .stat-card:nth-child(3)::before {
+            background: linear-gradient(90deg, var(--warning-color), #f97316);
+        }
+
+        .stat-card:nth-child(4)::before {
+            background: linear-gradient(90deg, var(--danger-color), #ef4444);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .trend-up {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .stat-progress {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 28px;
+            margin-bottom: 35px;
+        }
+
+        .chart-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .chart-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            height: 320px;
+            background-color: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            position: relative;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Transaction Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-top: 28px;
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            min-width: 1000px;
+        }
+
+        .transactions-table thead {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .transactions-table th {
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            white-space: nowrap;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .transactions-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .transactions-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .transactions-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .transaction-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .transaction-details h4 {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+
+        .transaction-details p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .amount {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .amount.positive {
+            color: var(--success-color);
+        }
+
+        .amount.negative {
+            color: var(--danger-color);
+        }
+
+        .status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--accent-color);
+        }
+
+        .status-failed {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .status-refunded {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: var(--info-color);
+        }
+
+        .payment-method {
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--text-dark);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Revenue Breakdown */
+        .revenue-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 28px;
+            margin-top: 35px;
+        }
+
+        .breakdown-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .breakdown-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .breakdown-item:hover {
+            background-color: #f8fafc;
+            padding-left: 12px;
+            padding-right: 12px;
+            border-radius: 8px;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .breakdown-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .breakdown-percentage {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            border: none;
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-icon.download {
+            color: var(--primary-color);
+        }
+
+        .btn-icon.print {
+            color: var(--warning-color);
+        }
+
+        /* Commission Auto Update Section */
+        .commission-update {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #a7f3d0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .commission-update .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .commission-update .info i {
+            color: var(--success-color);
+            font-size: 1.5rem;
+        }
+
+        .commission-update .info h4 {
+            color: var(--success-color);
+            margin-bottom: 4px;
+        }
+
+        .commission-update .info p {
+            color: #065f46;
+            font-size: 0.9rem;
+        }
+
+        /* Commission Calculation Section */
+        .commission-calculation {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #bae6fd;
+        }
+
+        .calculation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(186, 230, 253, 0.5);
+        }
+
+        .calculation-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        /* Payout Modal */
+        .payout-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1002;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payout-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--purple-color), #7c3aed);
+            color: white;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-body {
+            padding: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background-color: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 6px;
+        }
+
+        .modal-footer {
+            padding: 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Alert Messages */
+        .alert {
+            margin-bottom: 24px;
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .alert-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 35px;
+        }
+
+        /* Platform Balance Summary */
+        .balance-summary {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 28px;
+            border: 1px solid #bae6fd;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        /* ---------- RESPONSIVE DESIGN ---------- */
+        @media (max-width: 1200px) {
+            .revenue-stats,
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .mobile-header {
+                display: flex;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+                padding-top: calc(var(--header-height) + 20px);
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+                padding: 20px;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .date-range-selector {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .date-range-selector div {
+                width: 100%;
+                margin-top: 12px;
+            }
+            .date-picker {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+                padding-top: calc(var(--header-height) + 16px);
+            }
+            .page-header {
+                padding: 20px;
+            }
+            .header-title h1 {
+                font-size: 1.6rem;
+            }
+            .header-title p {
+                font-size: 0.9rem;
+            }
+            .analytics-section {
+                padding: 20px;
+                border-radius: 12px;
+            }
+            .revenue-stats,
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            .stat-card {
+                padding: 20px;
+            }
+            .stat-value {
+                font-size: 1.8rem;
+            }
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+            }
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            .chart-card {
+                padding: 20px;
+            }
+            .chart-container {
+                height: 280px;
+            }
+            .transactions-table {
+                font-size: 0.85rem;
+                min-width: 800px;
+            }
+            .transactions-table th,
+            .transactions-table td {
+                padding: 14px 12px;
+            }
+            .revenue-breakdown {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .breakdown-card {
+                padding: 20px;
+            }
+            .date-range-btn {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .revenue-stats,
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .header-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .admin-profile {
+                order: -1;
+                width: 100%;
+                justify-content: center;
+            }
+            .notification-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+            .stat-card {
+                padding: 20px;
+            }
+            .stat-value {
+                font-size: 1.6rem;
+            }
+            .section-header h2 {
+                font-size: 1.3rem;
+            }
+            .date-range-selector div {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .date-picker {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 12px;
+                padding-top: calc(var(--header-height) + 12px);
+            }
+            .mobile-header {
+                padding: 0 12px;
+            }
+            .mobile-logo-text {
+                font-size: 1.2rem;
+            }
+            .header-actions {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .page-header {
+                padding: 16px;
+            }
+            .analytics-section {
+                padding: 16px;
+            }
+            .table-container {
+                margin-left: -12px;
+                margin-right: -12px;
+                width: calc(100% + 24px);
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+            .revenue-stats,
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .stat-card {
+                padding: 20px;
+            }
+            .stat-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .trend-indicator {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ========== MOBILE HEADER ========== -->
+    <header class="mobile-header">
+        <div class="mobile-header-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mobile-logo">
+                <div class="mobile-logo-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <div class="mobile-logo-text">SkillConnect</div>
+            </div>
+        </div>
+        <button class="mobile-notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="mobile-notification-badge">{% if messages %}{{ messages|length }}{% else %}0{% endif %}</span>
+        </button>
+    </header>
+
+    <!-- ========== SIDEBAR OVERLAY ========== -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    {% include 'admin_html/admin_sidebar.html' %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Display Messages -->
+        {% if messages %}
+        <div id="alertContainer">
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-title">
+                <h1>Revenue Analytics & Payouts</h1>
+                <p>Track revenue, commissions, and manage payouts</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" id="exportReportBtn">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+                <button class="btn btn-payout" id="createPayoutBtn">
+                    <i class="fas fa-money-check-alt"></i> Create Payout
+                </button>
+                {% include 'admin_html/includes/admin_notification.html' %}
+                <div class="admin-profile">
+                    <div class="admin-avatar">{{ request.user.username|default:"A"|first|upper }}</div>
+                    <div>
+                        <h4 style="margin-bottom: 2px;">{{ request.user.username|default:"Administrator" }}</h4>
+                        <p style="color: var(--text-light); font-size: 0.85rem;">{{ request.user.email|default:"admin@skillconnect.com" }}</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Commission Auto Update Section -->
+        <div class="commission-update">
+            <div class="info">
+                <i class="fas fa-check-circle"></i>
+                <div>
+                    <h4>Commission Auto-Calculation Active</h4>
+                    <p>Commissions are automatically calculated at {{ commission_rate_percent }} rate. Last updated: {{ last_update_time|time:"H:i" }}</p>
+                </div>
+            </div>
+            <div style="font-size: 1.2rem; font-weight: 700; color: var(--success-color);">
+                {{ this_month_commission_formatted }}
+            </div>
+        </div>
+
+        <!-- Date Range Selector -->
+        <section class="analytics-section">
+            <div class="date-range-selector">
+                <button class="date-range-btn active" onclick="loadData('today')">Today</button>
+                <button class="date-range-btn" onclick="loadData('week')">Last 7 Days</button>
+                <button class="date-range-btn" onclick="loadData('month')">This Month</button>
+                <button class="date-range-btn" onclick="loadData('last_month')">Last Month</button>
+                <button class="date-range-btn" onclick="loadData('quarter')">This Quarter</button>
+                <button class="date-range-btn" onclick="loadData('year')">This Year</button>
+                <div style="display: flex; gap: 12px; width: 100%; margin-top: 16px;">
+                    <input type="date" class="date-picker" id="dateFrom" value="{{ month_start|date:'Y-m-d' }}">
+                    <span style="display: flex; align-items: center; font-weight: 500; color: var(--text-light);">to</span>
+                    <input type="date" class="date-picker" id="dateTo" value="{{ today|date:'Y-m-d' }}">
+                </div>
+            </div>
+
+            <!-- Revenue Statistics -->
+            <div class="revenue-stats">
+                <!-- Card 1: Total Platform Commission -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary-color), #60a5fa);">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <span class="trend-indicator trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            {{ commission_rate_percent }}
+                        </span>
+                    </div>
+                    <div class="stat-value">{{ total_commission_formatted }}</div>
+                    <div class="stat-label">Total Platform Commission ({{ commission_rate_percent }})</div>
+                    <div class="stat-progress">
+                        <div class="progress-bar" style="width: 85%; background: linear-gradient(90deg, var(--primary-color), #60a5fa);"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Total Withdrawals Done -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--warning-color), #fb923c);">
+                            <i class="fas fa-money-check-alt"></i>
+                        </div>
+                        <span class="trend-indicator trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            {{ payout_summary.completed_payouts|default:0 }} Paid
+                        </span>
+                    </div>
+                    <div class="stat-value">{{ total_withdrawals_formatted }}</div>
+                    <div class="stat-label">Total Withdrawals Done by Admin</div>
+                    <div class="stat-progress">
+                        <div class="progress-bar" style="width: 65%; background: linear-gradient(90deg, var(--warning-color), #fb923c);"></div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Available to Withdraw -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--success-color), #34d399);">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <span class="trend-indicator trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            Available
+                        </span>
+                    </div>
+                    <div class="stat-value">{{ available_for_payout_formatted }}</div>
+                    <div class="stat-label">Available to Withdraw</div>
+                    <div class="stat-progress">
+                        <div class="progress-bar" style="width: 72%; background: linear-gradient(90deg, var(--success-color), #34d399);"></div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Total Money Spent by Employers -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--danger-color), #f87171);">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <span class="trend-indicator trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            {{ total_payments }} Payments
+                        </span>
+                    </div>
+                    <div class="stat-value">{{ total_payment_formatted }}</div>
+                    <div class="stat-label">Total Money Spent by Employers</div>
+                    <div class="stat-progress">
+                        <div class="progress-bar" style="width: 100%; background: linear-gradient(90deg, var(--danger-color), #f87171);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Platform Balance Summary -->
+            <div class="balance-summary">
+                <h3 style="margin-bottom: 20px; color: var(--primary-color); display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-piggy-bank" style="font-size: 1.5rem;"></i>
+                    Platform Balance Summary
+                </h3>
+                <div class="calculation-item">
+                    <span>Total Platform Balance:</span>
+                    <strong style="color: var(--primary-color); font-size: 1.3rem;">{{ platform_balance_formatted }}</strong>
+                </div>
+                <div class="calculation-item">
+                    <span>Available for Payout:</span>
+                    <strong style="color: var(--success-color); font-weight: 700;">{{ available_for_payout_formatted }}</strong>
+                </div>
+                <div class="calculation-item">
+                    <span>Pending Payouts:</span>
+                    <strong style="color: var(--accent-color); font-weight: 700;">₹{{ payout_summary.pending_payouts|default:0 }}</strong>
+                </div>
+                <div class="calculation-item">
+                    <span>Next Payout Date:</span>
+                    <strong style="color: var(--purple-color); font-weight: 700;">{{ today|date:"M d, Y" }}</strong>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-line" style="color: var(--primary-color);"></i> Revenue Trends (Last 6 Months)</h3>
+                    <div class="chart-container">
+                        <canvas id="revenueTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-pie" style="color: var(--success-color);"></i> Revenue Distribution by Category</h3>
+                    <div class="chart-container">
+                        <canvas id="revenueDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="section-header" style="margin-top: 40px;">
+                <h2><i class="fas fa-exchange-alt"></i> Recent Transactions</h2>
+                <div class="action-buttons">
+                    <button class="btn-icon download" title="Download Report" id="downloadReportBtn">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="btn-icon print" title="Print Report" id="printReportBtn">
+                        <i class="fas fa-print"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction</th>
+                            <th>Type</th>
+                            <th>Booking ID</th>
+                            <th>Amount</th>
+                            <th>Commission ({{ commission_rate_percent }})</th>
+                            <th>Payment Method</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in recent_transactions %}
+                        <tr>
+                            <td>
+                                <div class="transaction-info">
+                                    <div class="transaction-avatar">{{ transaction.type|slice:":1"|upper }}</div>
+                                    <div class="transaction-details">
+                                        <h4>{{ transaction.description }}</h4>
+                                        {% if transaction.employer %}
+                                        <p>Employer: {{ transaction.employer }}</p>
+                                        {% elif transaction.employee %}
+                                        <p>Worker: {{ transaction.employee }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ transaction.transaction_type }}</td>
+                            <td>{{ transaction.booking_id }}</td>
+                            <td class="amount {% if transaction.amount > 0 %}positive{% else %}negative{% endif %}">
+                                {% if transaction.amount > 0 %}+{% endif %}{{ transaction.amount_formatted }}
+                            </td>
+                            <td class="amount {% if transaction.commission > 0 %}positive{% endif %}">
+                                {{ transaction.commission_formatted }}
+                            </td>
+                            <td><span class="payment-method">{{ transaction.payment_method_display }}</span></td>
+                            <td>{{ transaction.date|date:"d M Y" }}<br><span style="font-size: 0.85rem; color: var(--text-light);">{{ transaction.date|time:"H:i" }}</span></td>
+                            <td><span class="status {{ transaction.status_class }}">{{ transaction.status_display }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-light);">
+                                <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                                No transactions found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Revenue Breakdown -->
+        <section class="analytics-section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-bar"></i> Revenue Breakdown</h2>
+            </div>
+
+            <div class="revenue-breakdown">
+                <div class="breakdown-card">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 20px;">By Service Category</h3>
+                    <ul class="breakdown-list">
+                        {% for category in revenue_by_category %}
+                        <li class="breakdown-item">
+                            <div class="breakdown-label">
+                                <div class="breakdown-color" style="background-color: #3b82f6;"></div>
+                                <span>{{ category.name }}</span>
+                            </div>
+                            <div class="breakdown-percentage">{{ category.amount_formatted }} ({{ category.percentage }}%)</div>
+                        </li>
+                        {% empty %}
+                        <li class="breakdown-item">
+                            <div class="breakdown-label">
+                                <div class="breakdown-color" style="background-color: #ccc;"></div>
+                                <span>No category data</span>
+                            </div>
+                            <div class="breakdown-percentage">₹0 (0%)</div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="breakdown-card">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 20px;">By Payment Method</h3>
+                    <ul class="breakdown-list">
+                        {% for method in revenue_by_method %}
+                        <li class="breakdown-item">
+                            <div class="breakdown-label">
+                                <div class="breakdown-color" style="background-color: #10b981;"></div>
+                                <span>{{ method.display_name }}</span>
+                            </div>
+                            <div class="breakdown-percentage">{{ method.amount_formatted }} ({{ method.percentage }}%)</div>
+                        </li>
+                        {% empty %}
+                        <li class="breakdown-item">
+                            <div class="breakdown-label">
+                                <div class="breakdown-color" style="background-color: #ccc;"></div>
+                                <span>No method data</span>
+                            </div>
+                            <div class="breakdown-percentage">₹0 (0%)</div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Payout Modal -->
+    <div class="payout-modal" id="payoutModal">
+        <form method="POST" action="{% url 'create_payout' %}" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h3>Create Payout</h3>
+                <button type="button" class="modal-close" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Payout Amount (₹)</label>
+                    <input type="number" class="form-control" id="payoutAmount" name="amount" placeholder="Enter amount" min="1" step="0.01" required value="{{ available_for_payout|floatformat:2 }}">
+                    <div class="form-text">Available balance: <span id="availableBalanceDisplay">{{ available_for_payout_formatted }}</span></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Payout Method</label>
+                    <select class="form-control" id="payoutMethod" name="payout_method" required>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="upi">UPI</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="razorpay">Razorpay</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Recipient Account</label>
+                    <select class="form-control" id="recipientAccount" name="recipient_account">
+                        <option value="company_account">Company Account (Platform Revenue)</option>
+                        <option value="founder_account">Founder's Account</option>
+                        <option value="business_account">Business Account</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description (Optional)</label>
+                    <textarea class="form-control" id="payoutDescription" name="description" rows="3" placeholder="Add description for this payout"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Scheduled Date</label>
+                    <input type="date" class="form-control" id="payoutDate" name="scheduled_date" value="{{ today|date:'Y-m-d' }}">
+                    <div class="form-text">Leave empty for immediate payout</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelPayoutBtn">Cancel</button>
+                <button type="submit" class="btn btn-payout" id="confirmPayoutBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    Initiate Payout
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mobile sidebar toggle
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            if (menuToggle && sidebar && sidebarOverlay) {
+                menuToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                    sidebarOverlay.classList.toggle('active');
+                    document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+                });
+
+                sidebarOverlay.addEventListener('click', function () {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+
+            // Initialize Charts with Django data
+            const monthlyData = [
+                {% for month in monthly_revenue_data %}
+                {
+                    month: '{{ month.month }}',
+                    revenue: {{ month.revenue|default:0 }},
+                    commission: {{ month.commission|default:0 }}
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            const categoryData = [
+                {% for category in revenue_by_category %}
+                {
+                    name: '{{ category.name }}',
+                    amount: {{ category.amount|default:0 }}
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            initializeCharts(monthlyData, categoryData);
+
+            // Payout modal functionality
+            const createPayoutBtn = document.getElementById('createPayoutBtn');
+            const payoutModal = document.getElementById('payoutModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelPayoutBtn = document.getElementById('cancelPayoutBtn');
+
+            if (createPayoutBtn && payoutModal) {
+                createPayoutBtn.addEventListener('click', function () {
+                    payoutModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+
+            function closeModal() {
+                if (payoutModal) {
+                    payoutModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeModal);
+            }
+
+            if (cancelPayoutBtn) {
+                cancelPayoutBtn.addEventListener('click', closeModal);
+            }
+
+            // Close modal when clicking outside
+            if (payoutModal) {
+                payoutModal.addEventListener('click', function (e) {
+                    if (e.target === payoutModal) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // Date range buttons
+            const dateRangeBtns = document.querySelectorAll('.date-range-btn');
+            dateRangeBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    dateRangeBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Initialize Charts
+            function initializeCharts(monthlyData, categoryData) {
+                // Revenue Trend Chart (Line Chart)
+                const revenueTrendCtx = document.getElementById('revenueTrendChart');
+                if (revenueTrendCtx) {
+                    new Chart(revenueTrendCtx.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: monthlyData.map(m => m.month),
+                            datasets: [{
+                                label: 'Revenue (₹)',
+                                data: monthlyData.map(m => m.revenue),
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#3b82f6',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8
+                            }, {
+                                label: 'Commission (₹)',
+                                data: monthlyData.map(m => m.commission),
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#10b981',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        color: '#64748b',
+                                        font: {
+                                            size: 14,
+                                            weight: '600'
+                                        },
+                                        padding: 20
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                    titleColor: '#f8fafc',
+                                    bodyColor: '#e2e8f0',
+                                    borderColor: '#334155',
+                                    borderWidth: 1,
+                                    cornerRadius: 8,
+                                    callbacks: {
+                                        label: function (context) {
+                                            const label = context.dataset.label || '';
+                                            const value = context.parsed.y || 0;
+                                            return `${label}: ₹${formatNumber(value)}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: {
+                                        color: 'rgba(226, 232, 240, 0.5)',
+                                        drawBorder: false
+                                    },
+                                    ticks: {
+                                        color: '#64748b',
+                                        font: {
+                                            size: 12,
+                                            weight: '500'
+                                        }
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(226, 232, 240, 0.5)',
+                                        drawBorder: false
+                                    },
+                                    ticks: {
+                                        color: '#64748b',
+                                        font: {
+                                            size: 12,
+                                            weight: '500'
+                                        },
+                                        callback: function (value) {
+                                            return '₹' + (value / 1000).toFixed(0) + 'k';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Revenue Distribution Chart (Doughnut Chart)
+                const revenueDistributionCtx = document.getElementById('revenueDistributionChart');
+                if (revenueDistributionCtx && categoryData.length > 0) {
+                    // Generate colors for each category
+                    const colors = [
+                        '#3b82f6', '#10b981', '#f59e0b',
+                        '#ef4444', '#8b5cf6', '#06b6d4',
+                        '#ec4899', '#14b8a6'
+                    ];
+
+                    new Chart(revenueDistributionCtx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: categoryData.map(c => c.name),
+                            datasets: [{
+                                data: categoryData.map(c => c.amount),
+                                backgroundColor: colors.slice(0, categoryData.length),
+                                borderColor: colors.slice(0, categoryData.length).map(color => color.replace('0.8', '1')),
+                                borderWidth: 2,
+                                hoverOffset: 15
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '60%',
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        color: '#64748b',
+                                        font: {
+                                            size: 14,
+                                            weight: '600'
+                                        },
+                                        padding: 20,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle'
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                    titleColor: '#f8fafc',
+                                    bodyColor: '#e2e8f0',
+                                    borderColor: '#334155',
+                                    borderWidth: 1,
+                                    cornerRadius: 8,
+                                    callbacks: {
+                                        label: function (context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed || 0;
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = Math.round((value / total) * 100);
+                                            return `${label}: ₹${formatNumber(value)} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Format number with Indian numbering system
+            function formatNumber(num) {
+                return new Intl.NumberFormat('en-IN', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                }).format(num);
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 992 && sidebar) {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Prevent horizontal scroll
+            document.body.style.overflowX = 'hidden';
+
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function () {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+
+</html>

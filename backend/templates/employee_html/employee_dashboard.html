@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - WorkNest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #3a86ff;
+            --primary-light: #e6f0ff;
+            --primary-dark: #2667cc;
+            --secondary: #8338ec;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+            --card-bg: #ffffff;
+            --sidebar-bg: #1a2238;
+            --sidebar-text: #b0b7c3;
+            --sidebar-active: #3a86ff;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Styles - keep as before */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: fixed;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 1.5rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
+            border-left: 4px solid var(--primary);
+        }
+
+        .sidebar-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-close {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 0;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Top Bar - keep as before */
+        .top-bar {
+            background: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: var(--primary);
+            border: none;
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .page-title p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon i {
+            font-size: 1.3rem;
+            color: var(--gray);
+            transition: color 0.3s;
+        }
+
+        .notification-icon:hover i {
+            color: var(--primary);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .user-profile:hover {
+            background: var(--gray-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+            font-size: 1.1rem;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            width: 220px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 20px;
+            width: 16px;
+            height: 16px;
+            background: var(--white);
+            transform: rotate(45deg);
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(58, 134, 255, 0.3);
+        }
+
+        .welcome-text h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .welcome-text p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .date-time {
+            text-align: right;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .current-date {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .current-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .stat-info p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .stat-info small {
+            color: var(--success);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .bg-blue { background: var(--primary); }
+        .bg-green { background: var(--success); }
+        .bg-orange { background: var(--warning); color: #000; }
+        .bg-pink { background: var(--danger); }
+        .bg-purple { background: var(--secondary); }
+
+        /* Profile Completion Cards Section */
+        .profile-completion-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .completion-overview {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-circle {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .progress-circle svg {
+            width: 120px;
+            height: 120px;
+            transform: rotate(-90deg);
+        }
+
+        .progress-circle-bg {
+            fill: none;
+            stroke: var(--gray-light);
+            stroke-width: 10;
+        }
+
+        .progress-circle-fill {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .progress-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .progress-percentage span {
+            font-size: 1rem;
+            color: var(--gray);
+        }
+
+        .progress-text h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .progress-text p {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .profile-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .profile-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--shadow-lg);
+        }
+
+        .profile-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .profile-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .profile-card-info h4 {
+            font-size: 1.1rem;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .profile-card-info p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .profile-card-progress {
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-completed { background: var(--success); }
+        .progress-pending { background: var(--warning); }
+        .progress-not-started { background: var(--danger); }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .profile-card-action {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background: #05c290;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-light);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item:hover {
+            background: var(--light);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--dark);
+        }
+
+        .activity-description {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* Job Requests Section */
+        .job-requests {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .job-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--border-color);
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--shadow-lg);
+        }
+
+        .job-card-header {
+            padding: 1.5rem;
+            background: var(--primary-light);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .job-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .job-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .job-meta-item i {
+            color: var(--primary);
+        }
+
+        .job-badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .job-card-body {
+            padding: 1.5rem;
+        }
+
+        .job-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .job-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* View All Button */
+        .view-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .view-all-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* No Data Message */
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px var(--shadow);
+            grid-column: 1 / -1;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            color: var(--gray-light);
+            margin-bottom: 1rem;
+        }
+
+        .no-data h3 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .no-data p {
+            color: var(--text-light);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .job-requests {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-close {
+                display: block;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .welcome-section {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+            
+            .date-time {
+                text-align: center;
+            }
+            
+            .profile-cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .job-requests {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .top-bar {
+                padding: 1rem;
+            }
+            
+            .dashboard-content {
+                padding: 1.5rem;
+            }
+            
+            .menu-toggle {
+                margin-right: 10px;
+            }
+            
+            .stat-card {
+                padding: 1.2rem;
+            }
+            
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .stat-info h3 {
+                font-size: 1.6rem;
+            }
+
+            .job-details {
+                grid-template-columns: 1fr;
+            }
+
+            .job-actions {
+                flex-direction: column;
+            }
+
+            .job-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .profile-cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .completion-overview {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .user-info {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 0.8rem;
+            }
+            
+            .page-title h1 {
+                font-size: 1.5rem;
+            }
+            
+            .page-title p {
+                font-size: 0.8rem;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+            
+            .stat-info h3 {
+                font-size: 1.5rem;
+                margin-bottom: 2px;
+            }
+            
+            .stat-info p {
+                font-size: 0.8rem;
+            }
+            
+            .user-dropdown {
+                width: 200px;
+                right: -10px;
+            }
+            
+            .job-card-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'employee_html/employee_header.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <h1>EMPLOYEE DASHBOARD</h1>
+                <p>Manage and respond to incoming job requests</p> 
+            </div>
+
+            {% include 'employee_html/employee_dropdown.html' %}
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h2>Welcome back, {{ employee.first_name }}!</h2>
+                    <p>{{ greeting_message }}</p>
+                </div>
+                <div class="date-time">
+                    <div class="current-date">{{ current_date }}</div>
+                    <div class="current-time">{{ current_time }}</div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.total_jobs }}</h3>
+                        <p>Job Requests</p>
+                        <small>{% if stats.job_change > 0 %}+{{ stats.job_change }}{% else %}{{ stats.job_change }}{% endif %} from last week</small>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ employee.total_jobs_done }}</h3>
+                        <p>Completed Jobs</p>
+                        <small>{{ stats.success_rate }}% success rate</small>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ employee.rating|floatformat:1 }}</h3>
+                        <p>Average Rating</p>
+                        <small>{{ stats.review_count }} reviews</small>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-pink">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>₹{{ employee.total_earnings|floatformat:0 }}</h3>
+                        <p>Total Earnings</p>
+                        <small>Last 30 days: ₹{{ stats.last_month_earnings }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Completion Cards Section -->
+            <div class="profile-completion-section">
+                <div class="section-header">
+                    <h3>Profile Completion</h3>
+                    <a href="{% url 'employee_profile' %}" class="view-all-btn">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                </div>
+
+                <!-- Progress Overview -->
+                <div class="completion-overview">
+                    <div class="progress-circle">
+                        <svg>
+                            <circle class="progress-circle-bg" cx="60" cy="60" r="50"></circle>
+                            <circle class="progress-circle-fill" cx="60" cy="60" r="50" 
+                                    stroke-dashoffset="{{ profile_circle_offset }}"></circle>
+                        </svg>
+                        <div class="progress-percentage">
+                            {{ profile_completion }}<span>%</span>
+                        </div>
+                    </div>
+                    <div class="progress-text">
+                        <div>
+                            <h4>Profile Status</h4>
+                            <p>{{ profile_status_message }}</p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <div style="width: 12px; height: 12px; background: var(--success); border-radius: 2px;"></div>
+                                    <span style="font-size: 0.9rem;">{{ profile_completed_items }} completed</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <div style="width: 12px; height: 12px; background: var(--warning); border-radius: 2px;"></div>
+                                    <span style="font-size: 0.9rem;">{{ profile_pending_items }} pending</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Cards Grid -->
+                <div class="profile-cards-grid">
+                    <!-- Profile Photo Card -->
+                    <div class="profile-card">
+                        <div class="profile-card-header">
+                            <div class="profile-card-icon" style="background: var(--primary);">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="profile-card-info">
+                                <h4>Profile Photo</h4>
+                                <p>Add your profile picture</p>
+                            </div>
+                        </div>
+                        <div class="profile-card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if profile_items.profile_photo.completed %}progress-completed{% else %}progress-not-started{% endif %}" 
+                                     style="width: {% if profile_items.profile_photo.completed %}100%{% else %}0%{% endif %}"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>Status</span>
+                                <span>
+                                    {% if profile_items.profile_photo.completed %}
+                                        <i class="fas fa-check-circle" style="color: var(--success);"></i> Completed
+                                    {% else %}
+                                        <i class="fas fa-times-circle" style="color: var(--danger);"></i> Not Added
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="profile-card-action">
+                            <a href="{% url 'employee_profile' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> {% if profile_items.profile_photo.completed %}Update{% else %}Add{% endif %}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- About Me Card -->
+                    <div class="profile-card">
+                        <div class="profile-card-header">
+                            <div class="profile-card-icon" style="background: var(--success);">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="profile-card-info">
+                                <h4>About Me</h4>
+                                <p>Write about yourself</p>
+                            </div>
+                        </div>
+                        <div class="profile-card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if profile_items.bio.completed %}progress-completed{% else %}progress-not-started{% endif %}" 
+                                     style="width: {% if profile_items.bio.completed %}100%{% else %}0%{% endif %}"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>Status</span>
+                                <span>
+                                    {% if profile_items.bio.completed %}
+                                        <i class="fas fa-check-circle" style="color: var(--success);"></i> Completed
+                                    {% else %}
+                                        <i class="fas fa-times-circle" style="color: var(--danger);"></i> Not Added
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="profile-card-action">
+                            <a href="{% url 'employee_profile' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> {% if profile_items.bio.completed %}Update{% else %}Add{% endif %}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Skills Card -->
+                    <div class="profile-card">
+                        <div class="profile-card-header">
+                            <div class="profile-card-icon" style="background: var(--warning);">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="profile-card-info">
+                                <h4>Skills</h4>
+                                <p>Add your professional skills</p>
+                            </div>
+                        </div>
+                        <div class="profile-card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if profile_items.skills.completed %}progress-completed{% else %}progress-not-started{% endif %}" 
+                                     style="width: {% if profile_items.skills.completed %}100%{% else %}0%{% endif %}"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>Status</span>
+                                <span>
+                                    {% if profile_items.skills.completed %}
+                                        <i class="fas fa-check-circle" style="color: var(--success);"></i> {{ profile_items.skills.count }} skills
+                                    {% else %}
+                                        <i class="fas fa-times-circle" style="color: var(--danger);"></i> Not Added
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="profile-card-action">
+                            <a href="{% url 'employee_profile' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> {% if profile_items.skills.completed %}Manage{% else %}Add{% endif %}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Experience Card -->
+                    <div class="profile-card">
+                        <div class="profile-card-header">
+                            <div class="profile-card-icon" style="background: var(--secondary);">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <div class="profile-card-info">
+                                <h4>Work Experience</h4>
+                                <p>Add your work history</p>
+                            </div>
+                        </div>
+                        <div class="profile-card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if profile_items.experience.completed %}progress-completed{% else %}progress-not-started{% endif %}" 
+                                     style="width: {% if profile_items.experience.completed %}100%{% else %}0%{% endif %}"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>Status</span>
+                                <span>
+                                    {% if profile_items.experience.completed %}
+                                        <i class="fas fa-check-circle" style="color: var(--success);"></i> {{ profile_items.experience.count }} experiences
+                                    {% else %}
+                                        <i class="fas fa-times-circle" style="color: var(--danger);"></i> Not Added
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="profile-card-action">
+                            <a href="{% url 'employee_profile' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> {% if profile_items.experience.completed %}Manage{% else %}Add{% endif %}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Certificates Card -->
+                    <div class="profile-card">
+                        <div class="profile-card-header">
+                            <div class="profile-card-icon" style="background: var(--danger);">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <div class="profile-card-info">
+                                <h4>Certificates</h4>
+                                <p>Add your certificates & licenses</p>
+                            </div>
+                        </div>
+                        <div class="profile-card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if profile_items.certificates.completed %}progress-completed{% else %}progress-not-started{% endif %}" 
+                                     style="width: {% if profile_items.certificates.completed %}100%{% else %}0%{% endif %}"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>Status</span>
+                                <span>
+                                    {% if profile_items.certificates.completed %}
+                                        <i class="fas fa-check-circle" style="color: var(--success);"></i> {{ profile_items.certificates.count }} certificates
+                                    {% else %}
+                                        <i class="fas fa-times-circle" style="color: var(--danger);"></i> Not Added
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="profile-card-action">
+                            <a href="{% url 'employee_profile' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> {% if profile_items.certificates.completed %}Manage{% else %}Add{% endif %}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Card -->
+                    <div class="profile-card">
+                        <div class="profile-card-header">
+                            <div class="profile-card-icon" style="background: var(--success);">
+                                <i class="fas fa-images"></i>
+                            </div>
+                            <div class="profile-card-info">
+                                <h4>Portfolio</h4>
+                                <p>Showcase your work</p>
+                            </div>
+                        </div>
+                        <div class="profile-card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if profile_items.portfolio.completed %}progress-completed{% else %}progress-not-started{% endif %}" 
+                                     style="width: {% if profile_items.portfolio.completed %}100%{% else %}0%{% endif %}"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>Status</span>
+                                <span>
+                                    {% if profile_items.portfolio.completed %}
+                                        <i class="fas fa-check-circle" style="color: var(--success);"></i> {{ profile_items.portfolio.count }} items
+                                    {% else %}
+                                        <i class="fas fa-times-circle" style="color: var(--danger);"></i> Not Added
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="profile-card-action">
+                            <a href="{% url 'employee_profile' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> {% if profile_items.portfolio.completed %}Manage{% else %}Add{% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Section -->
+            <div class="recent-activity">
+                <div class="section-header">
+                    <h3>Recent Activity</h3>
+                    <a href="{% url 'employee_job_history' %}" class="view-all-btn">
+                        <i class="fas fa-history"></i> View All Activity
+                    </a>
+                </div>
+                
+                {% if recent_activities %}
+                <ul class="activity-list">
+                    {% for activity in recent_activities %}
+                    <li class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-{{ activity.icon }}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">{{ activity.title }}</div>
+                            <div class="activity-description">{{ activity.description }}</div>
+                            <div class="activity-time">{{ activity.time }}</div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="no-data" style="margin-top: 1rem;">
+                    <i class="fas fa-clock"></i>
+                    <h3>No Recent Activity</h3>
+                    <p>Your recent activities will appear here once you start using the platform.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Recent Job Requests Section -->
+            <div class="section-header">
+                <h2>Recent Job Requests</h2>
+                <a href="{% url 'employee_job_request' %}" class="view-all-btn">
+                    <i class="fas fa-eye"></i> View All Jobs
+                </a>
+            </div>
+
+            <div class="job-requests">
+                {% if recent_jobs %}
+                    {% for job in recent_jobs %}
+                        <div class="job-card">
+                            <div class="job-card-header">
+                                <div>
+                                    <div class="job-title">{{ job.title }}</div>
+                                    <div class="job-meta">
+                                        <div class="job-meta-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>
+                                                {% if job.city %}{{ job.city }}{% endif %}
+                                                {% if job.state %}, {{ job.state }}{% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="job-meta-item">
+                                            <i class="fas fa-clock"></i>
+                                            <span>{{ job.created_at|timesince }} ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    {% if job.priority == 'urgent' or job.priority == 'asap' %}
+                                        <span class="job-badge" style="background: var(--danger);">Urgent</span>
+                                    {% elif job.created_at|timesince < "1 day" %}
+                                        <span class="job-badge" style="background: var(--success);">New</span>
+                                    {% else %}
+                                        <span class="job-badge" style="background: var(--warning); color: #000;">Standard</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="job-card-body">
+                                <div class="job-description">
+                                    {{ job.description|truncatewords:30 }}
+                                </div>
+                                <div class="job-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Date</span>
+                                        <span class="detail-value">{{ job.proposed_date|date:"M d, Y" }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Budget</span>
+                                        <span class="detail-value">₹{{ job.budget|default:"Negotiable" }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Employer</span>
+                                        <span class="detail-value">{{ job.employer.company_name|default:job.employer.first_name }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Status</span>
+                                        <span class="detail-value">{{ job.get_status_display }}</span>
+                                    </div>
+                                </div>
+                                <div class="job-actions">
+                                    {% if job.status == 'pending' %}
+                                        <form method="POST" action="{% url 'accept_job_request' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="job_id" value="{{ job.job_id }}">
+                                            <button type="submit" class="btn btn-primary" 
+                                                    onclick="return confirm('Accept this job?')">
+                                                <i class="fas fa-check"></i> Accept
+                                            </button>
+                                        </form>
+                                        
+                                        <a href="{% url 'job_request_details' job.job_id %}" class="btn btn-outline">
+                                            <i class="fas fa-eye"></i> View Details
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'job_request_details' job.job_id %}" class="btn btn-primary">
+                                            <i class="fas fa-eye"></i> View Details
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-jobs">
+                        <i class="fas fa-briefcase"></i>
+                        <h3>No Job Requests Found</h3>
+                        <p>You don't have any recent job requests. New requests will appear here.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const overlay = document.getElementById('overlay');
+        
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+        }
+        
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+        
+        // User profile dropdown toggle
+        const userProfile = document.getElementById('userProfile');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userProfile && userDropdown) {
+            userProfile.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('active');
+            });
+        }
+        
+        // Update current time every minute
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeElement = document.querySelector('.current-time');
+            const dateElement = document.querySelector('.current-date');
+            
+            if (timeElement) {
+                const timeString = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+                timeElement.textContent = timeString;
+            }
+            
+            if (dateElement) {
+                const dateString = now.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                dateElement.textContent = dateString;
+            }
+        }
+        
+        // Initial update
+        updateCurrentTime();
+        
+        // Update time every minute
+        setInterval(updateCurrentTime, 60000);
+        
+        // Animate progress circle
+        function animateProgressCircle() {
+            const progressCircle = document.querySelector('.progress-circle-fill');
+            if (progressCircle) {
+                // Already animated by CSS transition, but we can trigger it
+                progressCircle.style.transition = 'stroke-dashoffset 1s ease';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            animateProgressCircle();
+        });
+        
+        // Job accept confirmation
+        const acceptForms = document.querySelectorAll('form[action*="accept_job_request"]');
+        acceptForms.forEach(form => {
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.addEventListener('click', function(e) {
+                    if (!confirm('Are you sure you want to accept this job?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    this.disabled = true;
+                    return true;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

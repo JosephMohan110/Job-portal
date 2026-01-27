@@ -1,0 +1,514 @@
+    {% include 'home_page_html/header.html' %}
+
+    <title>Terms & Conditions - Work Nest</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* CSS Variables */
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --accent: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+        }
+        
+        /* Body styles */
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+
+        /* Mobile Navigation */
+        .menu-toggle {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(rgba(44,62,80,0.85), rgba(44,62,80,0.9)),
+                        url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, rgba(52,152,219,0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(243,156,18,0.2) 0%, transparent 50%);
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(-10px) translateX(10px);
+            }
+        }
+        
+        .page-header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .page-header p {
+            font-size: 1.2rem;
+            animation: fadeInUp 1s ease-out .2s both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Terms Content */
+        .terms-content {
+            padding: 5rem 0;
+            background: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--dark);
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 3px;
+            background: var(--primary);
+            bottom: -10px;
+            left: 25%;
+            border-radius: 2px;
+        }
+        
+        .terms-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--light);
+            border-radius: 15px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        
+        .terms-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .terms-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .terms-section h3 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .terms-section h3 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .terms-section p {
+            margin-bottom: 1rem;
+            color: #555;
+        }
+        
+        .terms-section ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .terms-section ul li {
+            margin-bottom: 0.5rem;
+            color: #555;
+            position: relative;
+        }
+        
+        .terms-section ul li:before {
+            content: '•';
+            color: var(--primary);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        .last-updated {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            margin-top: 3rem;
+            text-align: center;
+        }
+        
+        .last-updated strong {
+            color: var(--accent);
+        }
+        
+        .highlight-box {
+            background: rgba(52,152,219,0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .highlight-box p {
+            margin: 0;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        /* Accept Terms */
+        .accept-terms {
+            background: #f5f5f5;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .accept-terms label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .accept-terms input[type="checkbox"] {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .accept-btn {
+            background: var(--secondary);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .3s;
+        }
+        
+        .accept-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .accept-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Responsive rules */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .terms-container {
+                padding: 2rem;
+            }
+            
+            .accept-terms {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            /* Mobile Navigation */
+            .menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                background: rgba(0,0,0,0.3);
+                padding: 15px 0;
+                text-align: center;
+                backdrop-filter: blur(6px);
+                border-radius: 10px;
+                margin-top: 15px;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .nav-links li {
+                margin: 12px 0;
+            }
+            
+            .auth-buttons {
+                margin-top: 10px;
+                justify-content: center;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: .9rem;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .terms-container {
+                padding: 1.5rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="page-header-content">
+                <h1>Terms & Conditions</h1>
+                <p>Please read these terms carefully before using Work Nest platform</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Terms Content -->
+    <section class="terms-content" id="terms-content">
+        <div class="container">
+            <div class="section-title">
+                <h2>Terms of Service</h2>
+                <p>Legal agreement between you and Work Nest</p>
+            </div>
+            
+            <div class="terms-container">
+                <div class="last-updated">
+                    <p><strong>Last Updated:</strong> November 15, 2023</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-user-check"></i> Acceptance of Terms</h3>
+                    <p>By accessing and using the Work Nest platform (hereinafter referred to as "the Platform"), you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you must not use our services.</p>
+                    
+                    <div class="highlight-box">
+                        <p>By creating an account or using our services, you confirm that you are at least 18 years of age and have the legal capacity to enter into this agreement.</p>
+                    </div>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-users"></i> User Accounts</h3>
+                    <p>When you create an account with Work Nest, you must provide accurate, complete, and current information. You are responsible for:</p>
+                    <ul>
+                        <li>Maintaining the confidentiality of your account credentials</li>
+                        <li>All activities that occur under your account</li>
+                        <li>Notifying us immediately of any unauthorized use of your account</li>
+                        <li>Ensuring that your account information remains accurate and up-to-date</li>
+                    </ul>
+                    <p>Work Nest reserves the right to suspend or terminate accounts that provide false information or violate our terms.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-briefcase"></i> Platform Services</h3>
+                    <p>Work Nest is a digital platform that connects daily wage workers ("Workers") with individuals or businesses seeking temporary labor ("Employers"). Our services include:</p>
+                    <ul>
+                        <li>Profile creation for Workers and Employers</li>
+                        <li>Job posting and bidding system</li>
+                        <li>Communication tools between parties</li>
+                        <li>Review and rating system</li>
+                        <li>Payment processing services (where applicable)</li>
+                    </ul>
+                    <p><strong>Important:</strong> Work Nest acts as an intermediary platform only. We are not a party to any employment agreement between Workers and Employers.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-handshake"></i> User Responsibilities</h3>
+                    <p>As a user of Work Nest, you agree to:</p>
+                    
+                    <h4>For Workers:</h4>
+                    <ul>
+                        <li>Provide accurate information about skills, experience, and qualifications</li>
+                        <li>Complete assigned work diligently and professionally</li>
+                        <li>Adhere to agreed-upon work schedules and deadlines</li>
+                        <li>Maintain proper conduct and professionalism</li>
+                        <li>Comply with all applicable laws and regulations</li>
+                    </ul>
+                    
+                    <h4>For Employers:</h4>
+                    <ul>
+                        <li>Provide clear and accurate job descriptions</li>
+                        <li>Pay agreed-upon wages promptly and in full</li>
+                        <li>Provide safe working conditions</li>
+                        <li>Communicate clearly about job requirements and expectations</li>
+                        <li>Treat all Workers with respect and dignity</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-money-bill-wave"></i> Payments and Fees</h3>
+                    <p>Work Nest may charge service fees for certain premium features. All payment terms are as follows:</p>
+                    <ul>
+                        <li>Standard membership is free for basic features</li>
+                        <li>Premium features may require subscription fees</li>
+                        <li>Payment processing fees may apply for certain transactions</li>
+                        <li>All payments must be made through our secure payment gateway</li>
+                        <li>Refund policies are outlined separately in our Payment Policy</li>
+                    </ul>
+                    
+                    <div class="highlight-box">
+                        <p><strong>Note:</strong> Work Nest is not responsible for payment disputes between Workers and Employers. We recommend using our secure payment system for all transactions.</p>
+                    </div>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-shield-alt"></i> Privacy and Data Protection</h3>
+                    <p>We are committed to protecting your privacy. Our Privacy Policy explains how we collect, use, and protect your personal information. By using our Platform, you consent to our data practices as described in our Privacy Policy.</p>
+                    <p>We implement industry-standard security measures to protect your data, but no system is completely secure. You are responsible for maintaining the security of your login credentials.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Prohibited Activities</h3>
+                    <p>You agree not to use the Platform for any unlawful or prohibited activities, including but not limited to:</p>
+                    <ul>
+                        <li>Posting false, misleading, or fraudulent information</li>
+                        <li>Harassing, threatening, or discriminating against other users</li>
+                        <li>Violating intellectual property rights</li>
+                        <li>Attempting to gain unauthorized access to other accounts or systems</li>
+                        <li>Posting offensive, obscene, or inappropriate content</li>
+                        <li>Engaging in any form of discrimination based on race, gender, religion, etc.</li>
+                        <li>Circumventing our payment systems or fee structures</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-balance-scale"></i> Limitation of Liability</h3>
+                    <p>To the maximum extent permitted by law, Work Nest shall not be liable for:</p>
+                    <ul>
+                        <li>Any indirect, incidental, special, or consequential damages</li>
+                        <li>Loss of profits, data, or business opportunities</li>
+                        <li>Disputes between Workers and Employers</li>
+                        <li>Quality of work performed by Workers</li>
+                        <li>Payment disputes between users</li>
+                        <li>Any damages resulting from platform downtime or technical issues</li>
+                    </ul>
+                    <p>Our total liability to you for any claim shall not exceed the amount paid by you to Work Nest in the last 6 months.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-gavel"></i> Dispute Resolution</h3>
+                    <p>In the event of disputes:</p>
+                    <ul>
+                        <li>Users should first attempt to resolve disputes directly</li>
+                        <li>Work Nest may provide mediation services at our discretion</li>
+                        <li>Legal disputes shall be governed by the laws of [Your Country/State]</li>
+                        <li>Any legal proceedings shall be filed in the courts of [Your City/State]</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-edit"></i> Modifications to Terms</h3>
+                    <p>Work Nest reserves the right to modify these Terms and Conditions at any time. We will notify users of significant changes via email or platform notifications. Continued use of the Platform after changes constitutes acceptance of the modified terms.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-times-circle"></i> Termination</h3>
+                    <p>Either party may terminate this agreement at any time by deleting your account. Work Nest reserves the right to suspend or terminate accounts that violate these terms or engage in prohibited activities.</p>
+                    <p>Upon termination, your right to use the Platform will immediately cease. All provisions of these terms which should survive termination shall survive, including ownership provisions, warranty disclaimers, and limitations of liability.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-question-circle"></i> Contact Information</h3>
+                    <p>If you have any questions about these Terms and Conditions, please contact us:</p>
+                    <ul>
+                        <li><strong>Email:</strong> legal@worknest.com</li>
+                        <li><strong>Address:</strong> 123 Main Street, City, Country</li>
+                        <li><strong>Phone:</strong> +1 234 567 8900</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+            {% include 'home_page_html/footer.html' %}
+
+
+</body>
+</html>

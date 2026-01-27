@@ -1,0 +1,90 @@
+cd ..      to bcack  folder
+
+cd backend
+
+4111 1111 1111 1111 - Success
+
+4012 8888 8888 1881 - International card test
+
+5100 0000 0000 0008 - Failure scenario
+
+5555 5555 5555 4444 - Mastercard test (any 16 digits starting with 5)
+5500 6700 0000 1002	
+4100 2800 0000 1007	
+
+env\Scripts\activate
+
+python manage.py flush
+# Type 'yes' when prompted
+
+python manage.py makemigrations home     home is app name
+
+python manage.py migrate
+
+python manage.py createsuperuser
+# Fill in email and password when prompted
+
+python manage.py runserver
+
+app create
+python manage.py startapp app_name
+
+
+employee user name: hello@gmail.com
+password: hello@123
+
+employeer user name: employer@gmail.com
+password: Employer@123
+
+admin: admin@gmail.com
+password: add@1234
+
+
+your_project/
+├── static/
+│   └── cssfolder/
+│       └── employer_css/
+│           ├── page1.css
+│           ├── page2.css
+│           └── ...
+├── templates/
+│   └── employer_html/
+│       ├── page1.html
+│       ├── page2.html
+│       └── ...
+└── ...
+
+
+
+
+
+
+
+
+
+
+backend/
+├── voice_assistant/
+│   ├── __init__.py
+│   ├── apps.py
+│   ├── voice_core.py      # Main engine
+│   ├── command_handler.py  # Command processing
+│   ├── views.py           # Django views
+│   ├── urls.py            # URLs
+│   └── management/
+│       └── commands/
+│           └── runvoice.py
+├── templates/
+│   └── voice_assistant/
+│       └── control.html
+
+
+
+
+
+
+git add backend/templates/home_page_html/index.html 
+
+git commit -m "index page header"
+
+git push origin main
