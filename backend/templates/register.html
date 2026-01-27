@@ -1,0 +1,610 @@
+{% load static %}
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Job Portal</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body> {% endcomment %}
+    {% include 'home_page_html/header.html' %}
+
+    <style>
+       * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        } 
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --accent: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        } 
+        /* Messages Styling */
+        .messages {
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Registration Section */
+        .registration-section {
+            flex: 1;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .registration-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+        }
+
+        .registration-info {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .registration-info::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .registration-info::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .registration-info h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .registration-info p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .benefits {
+            list-style: none;
+            margin-top: 2rem;
+            position: relative;
+            z-index: 1;
+            padding-left: 0;
+        }
+
+        .benefits li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .benefits i {
+            margin-right: 10px;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .registration-form {
+            flex: 1.2;
+            padding: 3rem;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--dark);
+        }
+
+        .form-title h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-title p {
+            color: #777;
+        }
+
+        .user-type {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-type-btn {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-type-btn i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .user-type-btn.active {
+            border-color: var(--primary);
+            background: var(--light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-submit {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+
+        .form-submit:hover {
+            background: #2980b9;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #777;
+        }
+
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .registration-container {
+                flex-direction: column;
+            }
+            
+            .registration-info {
+                order: 2;
+            }
+            
+            .registration-form {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+ 
+    /* Error styles */
+    .error-field {
+        border-color: #e74c3c !important;
+        border-width: 2px !important;
+    }
+    
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: block;
+    }
+    
+    .terms-error {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: block;
+    }
+    
+    /* Password strength indicator */
+    .password-strength {
+        margin-top: 5px;
+        font-size: 0.85rem;
+    }
+    
+    .strength-weak { color: #e74c3c; }
+    .strength-medium { color: #f39c12; }
+    .strength-strong { color: #27ae60; }
+</style>
+
+<!-- Messages Section -->
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Registration Section -->
+<section class="registration-section">
+    <div class="container">
+        <div class="registration-container">
+            <div class="registration-info">
+                <h2>Join Today</h2>
+                <p>Create an account to access thousands of job opportunities or find skilled workers for your projects.</p>
+                
+                <ul class="benefits">
+                    <li><i class="fas fa-check-circle"></i> Access to daily job opportunities</li>
+                    <li><i class="fas fa-check-circle"></i> Connect with verified employers/workers</li>
+                    <li><i class="fas fa-check-circle"></i> Secure payment system</li>
+                    <li><i class="fas fa-check-circle"></i> Build your professional profile</li>
+                    <li><i class="fas fa-check-circle"></i> Get rated and reviewed</li>
+                </ul>
+            </div>
+            <div class="registration-form">
+                <div class="form-title">
+                    <h2>Create Your Account</h2>
+                    <p>Join as an employee or employer</p>
+                </div>
+                
+                <!-- User Type Selection -->
+                <div class="user-type">
+                    <div class="user-type-btn {% if form_data.user_type == 'employee' or not form_data.user_type %}active{% endif %}" 
+                         data-user-type="employee">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Employee</span>
+                    </div>
+                    <div class="user-type-btn {% if form_data.user_type == 'employer' %}active{% endif %}" 
+                         data-user-type="employer">
+                        <i class="fas fa-building"></i>
+                        <span>Employer</span>
+                    </div>
+                </div>
+                
+                <!-- Registration Form -->
+                <form method="POST" action="{% url 'register' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_type" id="userType" 
+                           value="{{ form_data.user_type|default:'employee' }}">
+                    
+                    <!-- First Name -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" name="first_name" 
+                                   placeholder="Enter your first name" 
+                                   value="{{ form_data.first_name|default:'' }}"
+                                   class="{% if error_fields.first_name %}error-field{% endif %}"
+                                   required>
+                            {% if errors.first_name %}
+                            <span class="error-message">{{ errors.first_name }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Last Name -->
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" name="last_name" 
+                                   placeholder="Enter your last name" 
+                                   value="{{ form_data.last_name|default:'' }}"
+                                   class="{% if error_fields.last_name %}error-field{% endif %}"
+                                   required>
+                            {% if errors.last_name %}
+                            <span class="error-message">{{ errors.last_name }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" 
+                               placeholder="Enter your email" 
+                               value="{{ form_data.email|default:'' }}"
+                               class="{% if error_fields.email %}error-field{% endif %}"
+                               required>
+                        {% if errors.email %}
+                        <span class="error-message">{{ errors.email }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" 
+                               placeholder="Enter 10-digit Indian phone number" 
+                               value="{{ form_data.phone|default:'' }}"
+                               class="{% if error_fields.phone %}error-field{% endif %}"
+                               required>
+                        {% if errors.phone %}
+                        <span class="error-message">{{ errors.phone }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Passwords -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password1" 
+                                   placeholder="Create a password" 
+                                   class="{% if error_fields.password1 %}error-field{% endif %}"
+                                   required>
+                            {% if errors.password1 %}
+                            <span class="error-message">{{ errors.password1 }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="password2" 
+                                   placeholder="Confirm your password" 
+                                   class="{% if error_fields.password2 %}error-field{% endif %}"
+                                   required>
+                            {% if errors.password2 %}
+                            <span class="error-message">{{ errors.password2 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Employee-specific fields -->
+                    <div class="form-group" 
+                         id="skillsField" 
+                         style="display: {% if form_data.user_type == 'employer' %}none{% else %}block{% endif %};">
+                        <label for="skills">Skills</label>
+                        <textarea id="skills" name="skills" 
+                                  placeholder="List your skills (e.g. Carpentry, Painting, Plumbing)" 
+                                  rows="2"
+                                  class="{% if error_fields.skills %}error-field{% endif %}">{{ form_data.skills|default:'' }}</textarea>
+                        {% if errors.skills %}
+                        <span class="error-message">{{ errors.skills }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Employer-specific fields -->
+                    <div class="form-group" 
+                         id="companyField" 
+                         style="display: {% if form_data.user_type == 'employer' %}block{% else %}none{% endif %};">
+                        <label for="company">Company Name</label>
+                        <input type="text" id="company" name="company_name" 
+                               placeholder="Enter your company name" 
+                               value="{{ form_data.company_name|default:'' }}"
+                               class="{% if error_fields.company_name %}error-field{% endif %}">
+                        {% if errors.company_name %}
+                        <span class="error-message">{{ errors.company_name }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" 
+                               placeholder="Enter your location (City, State)" 
+                               value="{{ form_data.location|default:'' }}"
+                               class="{% if error_fields.location %}error-field{% endif %}"
+                               required>
+                        {% if errors.location %}
+                        <span class="error-message">{{ errors.location }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Profile Photo -->
+                    <div class="form-group">
+                        <label for="profilePhoto">Profile Photo (Optional)</label>
+                        <input type="file" id="profilePhoto" name="profile_photo" 
+                               accept="image/*"
+                               class="{% if error_fields.profile_photo %}error-field{% endif %}">
+                        {% if errors.profile_photo %}
+                        <span class="error-message">{{ errors.profile_photo }}</span>
+                        {% endif %}
+                        <small class="text-muted">Max file size: 5MB. Allowed formats: JPG, PNG, GIF</small>
+                    </div>
+                    
+                    <!-- Terms and Conditions -->
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="terms" 
+                                   {% if not errors.terms %}checked{% endif %}>
+                            I agree to the <a href="{% url 'privacy_terms' %}" target="_blank">Terms & Conditions</a> and <a href="{% url 'privacy_terms' %}" target="_blank">Privacy Policy</a>
+                        </label>
+                        {% if errors.terms %}
+                        <span class="terms-error">{{ errors.terms }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="form-submit">Create Account</button>
+                    
+                    <div class="form-footer">
+                        <p>Already have an account? <a href="{% url 'index' %}">Login here</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Minimal JavaScript for UI interactions only
+    document.addEventListener('DOMContentLoaded', function() {
+        // User type selection
+        const userTypeButtons = document.querySelectorAll('.user-type-btn');
+        const skillsField = document.getElementById('skillsField');
+        const companyField = document.getElementById('companyField');
+        const userTypeInput = document.getElementById('userType');
+        
+        userTypeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active state
+                userTypeButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Get selected user type
+                const userType = this.getAttribute('data-user-type');
+                userTypeInput.value = userType;
+                
+                // Show/hide fields based on user type
+                if (userType === 'employee') {
+                    skillsField.style.display = 'block';
+                    companyField.style.display = 'none';
+                    // Clear company field
+                    document.getElementById('company').value = '';
+                } else {
+                    skillsField.style.display = 'none';
+                    companyField.style.display = 'block';
+                    // Clear skills field
+                    document.getElementById('skills').value = '';
+                }
+            });
+        });
+        
+        // Add error class to form fields on page load
+        document.querySelectorAll('.error-field').forEach(field => {
+            field.addEventListener('input', function() {
+                this.classList.remove('error-field');
+                // Remove error message if it exists
+                const errorSpan = this.nextElementSibling;
+                if (errorSpan && errorSpan.classList.contains('error-message')) {
+                    errorSpan.remove();
+                }
+            });
+        });
+        
+        // Phone number formatting
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                
+                // Limit to 10 digits for Indian numbers
+                if (value.length > 10) {
+                    value = value.slice(0, 10);
+                }
+                
+                e.target.value = value;
+            });
+        }
+        
+        // Password strength indicator (optional, can be removed if no JS logic wanted)
+        const passwordInput = document.getElementById('password');
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function(e) {
+                const value = e.target.value;
+                // Remove any existing strength indicator
+                const existingIndicator = document.getElementById('password-strength');
+                if (existingIndicator) {
+                    existingIndicator.remove();
+                }
+            });
+        }
+    });
+</script>
+
+{% include 'home_page_html/footer.html' %}
+</body>
+</html>
