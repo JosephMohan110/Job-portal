@@ -5279,10 +5279,10 @@ def get_ml_predictions():
         # Get predictions
         predictions = predictor.predict(platform_data)
         
-        print(f"ML Predictions: {predictions}")  # Debug output
+        print(f"ML Predictions received: {len(predictions)} predictions")
         
-        if not predictions:
-            print("No predictions returned, using fallback")
+        if not predictions or all(v == 0 for v in predictions.values()):
+            print("All predictions are zero, using fallback")
             return get_fallback_predictions(platform_data)
         
         # Format predictions for display
@@ -5319,6 +5319,9 @@ def get_ml_predictions():
             'raw_predictions': predictions,
         }
         
+        # Debug output
+        print(f"Formatted predictions: {formatted_predictions}")
+        
         return formatted_predictions
         
     except Exception as e:
@@ -5326,7 +5329,8 @@ def get_ml_predictions():
         import traceback
         traceback.print_exc()
         return get_fallback_predictions(get_platform_analytics_data())
-    
+
+        
 
 
 def get_fallback_predictions(platform_data):
