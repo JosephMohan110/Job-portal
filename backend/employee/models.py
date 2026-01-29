@@ -402,6 +402,10 @@ class JobRequest(models.Model):
     address = models.TextField(null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
     state = models.CharField(max_length=100, null=True, blank=True)
+
+    rejection_reason = models.TextField(null=True, blank=True)
+    rejection_message_sent = models.BooleanField(default=False)
+
     
     class Meta:
         db_table = 'job_request_table'
