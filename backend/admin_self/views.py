@@ -5161,7 +5161,9 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from .ml_utils import predictor
 
-# Add this function in views.py
+
+# admin_self/views.py - Update these functions
+
 def get_platform_analytics_data():
     """Collect current platform data for ML predictions"""
     now = timezone.now()
@@ -5175,7 +5177,7 @@ def get_platform_analytics_data():
     # Calculate active users (users with activity in last 7 days)
     seven_days_ago = now - timedelta(days=7)
     
-    # Estimate active users based on job requests and payments
+    # Estimate active users
     active_workers = Employee.objects.filter(
         Q(updated_at__gte=seven_days_ago) |
         Q(job_requests__created_at__gte=seven_days_ago)
@@ -5269,38 +5271,44 @@ def get_platform_analytics_data():
         'avg_spending_per_job': avg_spending_per_job,
     }
 
-
 def get_ml_predictions():
     """Get ML predictions for platform metrics"""
     try:
         # Get current platform data
         platform_data = get_platform_analytics_data()
         
-        # Get predictions
+        # Ensure predictor is loaded
+        if not predictor.loaded:
+            predictor.load_model()
+        
+        if not predictor.loaded:
+            print("ML model not loaded, using fallback")
+            return get_fallback_predictions(platform_data)
+        
+        # Get predictions from ML model
         predictions = predictor.predict(platform_data)
         
         print(f"ML Predictions received: {len(predictions)} predictions")
         
-        if not predictions or all(v == 0 for v in predictions.values()):
-            print("All predictions are zero, using fallback")
+        if not predictions:
+            print("No predictions returned, using fallback")
             return get_fallback_predictions(platform_data)
         
-        # Format predictions for display
+        # Format predictions for display - map ML predictions to display names
         formatted_predictions = {
+            # Map ML model outputs to display names
             'new_users_next_month': int(predictions.get('platform_new_signups', 
                 predictions.get('new_signups', 
                 platform_data['new_users_this_month'] * 1.12))),
             
-            'deleted_accounts_next_month': int(predictions.get('platform_deletions', 
-                predictions.get('deletions',
-                platform_data['deleted_accounts_this_month'] * 0.92))),
+            'deleted_accounts_next_month': int(predictions.get('platform_deletions',
+                platform_data['deleted_accounts_this_month'] * 0.92)),
             
             'completed_bookings_next_month': int(predictions.get('completed_bookings',
                 platform_data['completed_bookings'] * 1.18)),
             
             'active_users_next_month': int(predictions.get('platform_active_users',
-                predictions.get('active_users',
-                platform_data['active_users'] * 1.07))),
+                platform_data['active_users'] * 1.07)),
             
             'revenue_next_month': float(predictions.get('total_transaction_value',
                 predictions.get('total_spent',
@@ -5310,17 +5318,26 @@ def get_ml_predictions():
                 platform_data['platform_commission'] * 1.18)),
             
             'success_rate_next_month': min(100, max(0, predictions.get('success_rate',
-                predictions.get('completion_rate',
-                platform_data['success_rate'] * 1.05)))),
+                platform_data['success_rate'] * 1.05))),
             
             'avg_rating_next_month': min(5, max(0, predictions.get('avg_rating',
                 platform_data['avg_rating'] * 1.01))),
             
+            'total_bookings_next_month': int(predictions.get('total_bookings',
+                platform_data['total_bookings'] * 1.12)),
+            
+            # Add raw predictions for debugging
             'raw_predictions': predictions,
         }
         
         # Debug output
-        print(f"Formatted predictions: {formatted_predictions}")
+        print("="*50)
+        print("ML PREDICTION RESULTS:")
+        print("="*50)
+        for key, value in formatted_predictions.items():
+            if key != 'raw_predictions':
+                print(f"{key}: {value}")
+        print("="*50)
         
         return formatted_predictions
         
@@ -5330,11 +5347,9 @@ def get_ml_predictions():
         traceback.print_exc()
         return get_fallback_predictions(get_platform_analytics_data())
 
-        
-
-
 def get_fallback_predictions(platform_data):
     """Fallback predictions if ML model fails"""
+    print("Using fallback predictions")
     return {
         'new_users_next_month': int(platform_data['new_users_this_month'] * 1.12),
         'deleted_accounts_next_month': int(platform_data['deleted_accounts_this_month'] * 0.92),
@@ -5344,8 +5359,61 @@ def get_fallback_predictions(platform_data):
         'commission_next_month': float(platform_data['platform_commission'] * 1.18),
         'success_rate_next_month': min(100, platform_data['success_rate'] * 1.05),
         'avg_rating_next_month': min(5, platform_data['avg_rating'] * 1.01),
+        'total_bookings_next_month': int(platform_data['total_bookings'] * 1.12),
         'raw_predictions': {},
     }
+
+# Update the analytics_prediction view function
+@admin_required
+def analytics_prediction(request):
+    """Analytics and prediction view with ML integration"""
+    
+    # Get current platform data
+    platform_data = get_platform_analytics_data()
+    
+    # Get ML predictions - THIS IS THE KEY CONNECTION
+    ml_predictions = get_ml_predictions()
+    
+    # Get churn risk users
+    churn_users = get_churn_risk_users()
+    
+    # Get feature importance FROM THE MODEL
+    feature_importance = predictor.get_feature_importance()
+    
+    # Get historical data for charts (last 6 months)
+    historical_data = get_historical_data(6)
+    
+    # Get growth rates
+    growth_rates = calculate_growth_rates(historical_data, platform_data)
+    
+    # Prepare AI insights
+    ai_insights = generate_ai_insights(platform_data, ml_predictions, churn_users)
+    
+    # Prepare chart data - USE ML PREDICTIONS FOR NEXT MONTH
+    chart_data = prepare_chart_data(historical_data, ml_predictions)
+    
+    # Get available predictions from model
+    available_predictions = predictor.get_available_predictions()
+    
+    context = {
+        'platform_data': platform_data,
+        'ml_predictions': ml_predictions,
+        'churn_users': churn_users[:10],  # Top 10
+        'feature_importance': feature_importance,
+        'historical_data': historical_data,
+        'growth_rates': growth_rates,
+        'ai_insights': ai_insights,
+        'chart_data': chart_data,
+        'current_month': datetime.now().strftime('%B %Y'),
+        'next_month': (datetime.now().replace(day=28) + timedelta(days=4)).strftime('%B %Y'),
+        'ml_model_loaded': predictor.loaded,
+        'available_predictions': available_predictions,
+    }
+    
+    return render(request, 'admin_html/analytics_prediction.html', context)
+        
+
+
 
 
 def get_churn_risk_users():
