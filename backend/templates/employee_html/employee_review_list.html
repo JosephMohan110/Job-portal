@@ -1171,15 +1171,25 @@
                         <div class="review-card">
                             <div class="review-header">
                                 <div class="reviewer-info">
+
+
                                     <div class="reviewer-avatar">
-                                        {% if review.employer %}
-                                        {{ review.employer.first_name|slice:":1" }}{{
-                                        review.employer.last_name|slice:":1"
-                                        }}
+                                    {% if review.employer %}
+                                        {% if review.employer.first_name and review.employer.last_name %}
+                                            {{ review.employer.first_name|slice:":1" }}{{ review.employer.last_name|slice:":1" }}
+                                        {% elif review.employer.first_name %}
+                                            {{ review.employer.first_name|slice:":1" }}
+                                        {% elif review.employer.company_name %}
+                                            {{ review.employer.company_name|slice:":1" }}
                                         {% else %}
-                                        EE
+                                            EE
                                         {% endif %}
-                                    </div>
+                                    {% else %}
+                                        EE
+                                    {% endif %}
+                                </div>
+
+                            
                                     <div class="reviewer-details">
                                         <h4>
                                             {% if review.employer %}
