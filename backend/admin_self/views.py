@@ -4835,9 +4835,10 @@ def algorithm_setting(request):
 
 #************************************************************
 
+
 @admin_required
 def upload_ml_model(request):
-    """Handle ML model upload"""
+    """Handle ML model upload with proper file management"""
     if request.method == 'POST':
         try:
             # Get form data
@@ -4874,6 +4875,66 @@ def upload_ml_model(request):
             if MLModel.objects.filter(model_name=model_name).exists():
                 messages.warning(request, f"A model with name '{model_name}' already exists.")
             
+            # ============================================
+            # HANDLE OLD MODEL BACKUP BEFORE UPLOADING NEW ONE
+            # ============================================
+            
+            # Define paths
+            xg_boost_dir = os.path.join(settings.BASE_DIR, 'xg_boost')
+            current_model_path = os.path.join(xg_boost_dir, 'complete_xgboost_package.pkl')
+            old_models_dir = os.path.join(xg_boost_dir, 'old_version_model')
+            
+            # Create directories if they don't exist
+            os.makedirs(xg_boost_dir, exist_ok=True)
+            os.makedirs(old_models_dir, exist_ok=True)
+            
+            # Check if current model exists and move it to old_models directory
+            if os.path.exists(current_model_path):
+                # Find the next version number for old models
+                old_model_files = [f for f in os.listdir(old_models_dir) if f.endswith('.pkl')]
+                old_version_numbers = []
+                
+                for filename in old_model_files:
+                    try:
+                        # Extract number from filename (e.g., "xgboost_model_1.pkl" -> 1)
+                        num = int(filename.replace('xgboost_model_', '').replace('.pkl', ''))
+                        old_version_numbers.append(num)
+                    except:
+                        pass
+                
+                next_version = max(old_version_numbers) + 1 if old_version_numbers else 1
+                
+                # Create new filename with version number
+                old_model_filename = f'xgboost_model_{next_version}.pkl'
+                old_model_path = os.path.join(old_models_dir, old_model_filename)
+                
+                # Move/rename the current model
+                os.rename(current_model_path, old_model_path)
+                
+                # Also archive the associated MLModel record if it exists
+                active_models = MLModel.objects.filter(status='deployed', is_active=True)
+                for active_model in active_models:
+                    active_model.status = 'archived'
+                    active_model.is_active = False
+                    active_model.save()
+            
+            # ============================================
+            # SAVE NEW UPLOADED MODEL WITH STANDARD NAME
+            # ============================================
+            
+            # Read uploaded file content
+            model_content = model_file.read()
+            
+            # Save with standard filename
+            standard_filename = 'complete_xgboost_package.pkl'
+            model_file_path = os.path.join(xg_boost_dir, standard_filename)
+            
+            with open(model_file_path, 'wb') as f:
+                f.write(model_content)
+            
+            # Calculate file size
+            file_size = len(model_content)
+            
             # Create ML model record
             ml_model = MLModel.objects.create(
                 model_name=model_name,
@@ -4881,7 +4942,9 @@ def upload_ml_model(request):
                 version=version,
                 description=description,
                 algorithm='XGBoost',
-                model_file=model_file,
+                # Save original filename in model_file field for reference
+                model_file=model_file,  # This will save in Django's media storage
+                file_size=file_size,
                 n_estimators=n_estimators,
                 max_depth=max_depth,
                 learning_rate=learning_rate,
@@ -4889,16 +4952,20 @@ def upload_ml_model(request):
                 subsample=subsample,
                 colsample_bytree=colsample_bytree,
                 uploaded_by=request.user,
-                status='pending',
-                is_active=False,
-                training_date=timezone.now().date()
+                status='deployed',  # Auto-deploy since it's replacing the current one
+                is_active=True,
+                training_date=timezone.now().date(),
+                deployed_at=timezone.now(),
             )
             
-            # Calculate and save file size
-            ml_model.file_size = model_file.size
-            ml_model.save()
+            messages.success(request, f"XGBoost model '{model_name}' uploaded and deployed successfully!")
             
-            messages.success(request, f"XGBoost model '{model_name}' uploaded successfully! Status: Pending Review")
+            # Reload the predictor
+            try:
+                from xg_boost.predictor import predictor
+                predictor.load_model()  # Force reload
+            except Exception as e:
+                print(f"Warning: Could not reload predictor: {str(e)}")
             
             return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
             
@@ -4907,15 +4974,20 @@ def upload_ml_model(request):
             return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
         except Exception as e:
             messages.error(request, f"Error uploading model: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
             return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
     
     return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
 
+
+
 #**************************************************************
+
 
 @admin_required
 def update_model_status(request, model_id):
-    """Update model status"""
+    """Update model status with complete actions"""
     if request.method == 'POST':
         try:
             ml_model = MLModel.objects.get(model_id=model_id)
@@ -4923,19 +4995,44 @@ def update_model_status(request, model_id):
             notes = request.POST.get('notes', '').strip()
             
             if action == 'deploy':
-                # Deactivate other models of the same type
+                # Deactivate other models of the same type first
                 MLModel.objects.filter(
                     model_type=ml_model.model_type,
                     is_active=True
-                ).update(is_active=False)
+                ).exclude(model_id=model_id).update(is_active=False)
                 
                 ml_model.status = 'deployed'
                 ml_model.is_active = True
                 ml_model.deployed_at = timezone.now()
+                
+                # If this is an XGBoost model, copy it to the standard location
+                if ml_model.algorithm == 'XGBoost' and ml_model.model_file:
+                    xg_boost_dir = os.path.join(settings.BASE_DIR, 'xg_boost')
+                    current_model_path = os.path.join(xg_boost_dir, 'complete_xgboost_package.pkl')
+                    
+                    # Create directory if it doesn't exist
+                    os.makedirs(xg_boost_dir, exist_ok=True)
+                    
+                    # Copy the model file to standard location
+                    try:
+                        with open(ml_model.model_file.path, 'rb') as source:
+                            with open(current_model_path, 'wb') as dest:
+                                dest.write(source.read())
+                        
+                        # Reload predictor
+                        try:
+                            from xg_boost.predictor import predictor
+                            predictor.load_model()
+                        except Exception as e:
+                            print(f"Warning: Could not reload predictor: {str(e)}")
+                    except Exception as e:
+                        print(f"Warning: Could not copy model file: {str(e)}")
+                
                 message = f"Model '{ml_model.model_name}' deployed successfully!"
                 
             elif action == 'test':
                 ml_model.status = 'testing'
+                ml_model.is_active = False
                 message = f"Model '{ml_model.model_name}' marked for testing."
                 
             elif action == 'approve':
@@ -4944,6 +5041,7 @@ def update_model_status(request, model_id):
                 
             elif action == 'reject':
                 ml_model.status = 'failed'
+                ml_model.is_active = False
                 message = f"Model '{ml_model.model_name}' rejected."
                 
             elif action == 'archive':
@@ -4952,36 +5050,167 @@ def update_model_status(request, model_id):
                 message = f"Model '{ml_model.model_name}' archived."
                 
             elif action == 'activate':
+                # Deactivate other active models of the same type first
+                MLModel.objects.filter(
+                    model_type=ml_model.model_type,
+                    is_active=True
+                ).exclude(model_id=model_id).update(is_active=False)
+                
                 ml_model.status = 'deployed'
                 ml_model.is_active = True
-                message = f"Model '{ml_model.model_name}' activated."
+                
+                # If this is an XGBoost model, copy it to the standard location
+                if ml_model.algorithm == 'XGBoost' and ml_model.model_file:
+                    xg_boost_dir = os.path.join(settings.BASE_DIR, 'xg_boost')
+                    current_model_path = os.path.join(xg_boost_dir, 'complete_xgboost_package.pkl')
+                    
+                    # Create directory if it doesn't exist
+                    os.makedirs(xg_boost_dir, exist_ok=True)
+                    
+                    # Copy the model file to standard location
+                    try:
+                        with open(ml_model.model_file.path, 'rb') as source:
+                            with open(current_model_path, 'wb') as dest:
+                                dest.write(source.read())
+                        
+                        # Reload predictor
+                        try:
+                            from xg_boost.predictor import predictor
+                            predictor.load_model()
+                        except Exception as e:
+                            print(f"Warning: Could not reload predictor: {str(e)}")
+                    except Exception as e:
+                        print(f"Warning: Could not copy model file: {str(e)}")
+                
+                message = f"Model '{ml_model.model_name}' activated and deployed!"
                 
             elif action == 'deactivate':
                 ml_model.is_active = False
                 message = f"Model '{ml_model.model_name}' deactivated."
                 
+            elif action == 'restore':
+                # Restore from old version
+                version_num = request.POST.get('version_num', '')
+                if version_num:
+                    old_models_dir = os.path.join(settings.BASE_DIR, 'xg_boost', 'old_version_model')
+                    old_model_path = os.path.join(old_models_dir, f'xgboost_model_{version_num}.pkl')
+                    current_model_path = os.path.join(settings.BASE_DIR, 'xg_boost', 'complete_xgboost_package.pkl')
+                    
+                    if os.path.exists(old_model_path):
+                        # Backup current model first (move to old_models folder)
+                        if os.path.exists(current_model_path):
+                            # Find the next version number for old models
+                            old_model_files = [f for f in os.listdir(old_models_dir) if f.endswith('.pkl')]
+                            old_version_numbers = []
+                            
+                            for filename in old_model_files:
+                                try:
+                                    num = int(filename.replace('xgboost_model_', '').replace('.pkl', ''))
+                                    old_version_numbers.append(num)
+                                except:
+                                    pass
+                            
+                            next_version = max(old_version_numbers) + 1 if old_version_numbers else 1
+                            
+                            # Create new filename with version number
+                            backup_filename = f'xgboost_model_{next_version}.pkl'
+                            backup_path = os.path.join(old_models_dir, backup_filename)
+                            
+                            # Move current model to backup
+                            os.rename(current_model_path, backup_path)
+                            
+                            # Archive current MLModel record
+                            current_models = MLModel.objects.filter(is_active=True)
+                            for current_model in current_models:
+                                current_model.status = 'archived'
+                                current_model.is_active = False
+                                current_model.save()
+                        
+                        # Restore old model to current location
+                        with open(old_model_path, 'rb') as source:
+                            with open(current_model_path, 'wb') as dest:
+                                dest.write(source.read())
+                        
+                        # Update the current model record
+                        ml_model.status = 'deployed'
+                        ml_model.is_active = True
+                        ml_model.deployed_at = timezone.now()
+                        
+                        # Update filename in database to reflect restoration
+                        ml_model.model_file.name = f'ml_models/xgboost/restored_version_{version_num}.pkl'
+                        
+                        # Reload predictor
+                        try:
+                            from xg_boost.predictor import predictor
+                            predictor.load_model()
+                        except Exception as e:
+                            print(f"Warning: Could not reload predictor: {str(e)}")
+                        
+                        message = f"Model restored from version {version_num} and deployed successfully!"
+                    else:
+                        messages.error(request, f"Old model version {version_num} not found.")
+                        return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
+                else:
+                    messages.error(request, "Version number required for restoration.")
+                    return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
+                
+            elif action == 'download_backup':
+                # Download backup file
+                version_num = request.POST.get('version_num', '')
+                if version_num:
+                    old_models_dir = os.path.join(settings.BASE_DIR, 'xg_boost', 'old_version_model')
+                    backup_path = os.path.join(old_models_dir, f'xgboost_model_{version_num}.pkl')
+                    
+                    if os.path.exists(backup_path):
+                        with open(backup_path, 'rb') as f:
+                            response = HttpResponse(f.read(), content_type='application/octet-stream')
+                            response['Content-Disposition'] = f'attachment; filename="xgboost_backup_v{version_num}.pkl"'
+                            return response
+                    else:
+                        messages.error(request, f"Backup version {version_num} not found.")
+                else:
+                    messages.error(request, "Version number required.")
+                    
+                return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
+                
+            elif action == 'delete_backup':
+                # Delete backup file
+                version_num = request.POST.get('version_num', '')
+                if version_num:
+                    old_models_dir = os.path.join(settings.BASE_DIR, 'xg_boost', 'old_version_model')
+                    backup_path = os.path.join(old_models_dir, f'xgboost_model_{version_num}.pkl')
+                    
+                    if os.path.exists(backup_path):
+                        os.remove(backup_path)
+                        message = f"Backup version {version_num} deleted."
+                    else:
+                        messages.error(request, f"Backup version {version_num} not found.")
+                        return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
+                else:
+                    messages.error(request, "Version number required.")
+                    return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
+                
             else:
                 messages.error(request, "Invalid action.")
-                return redirect('algorithm_setting?tab=model-management')
+                return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
+            
+            # Add notes if provided
+            if notes:
+                ml_model.notes = notes
             
             # Save model
             ml_model.save()
-            
-            # Create performance log if testing
-            if action == 'test' and notes:
-                from .models import ModelPerformance
-                # This would be where you'd add actual performance metrics
-                # For now, we'll just create a placeholder
-                pass
-            
             messages.success(request, message)
             
         except MLModel.DoesNotExist:
             messages.error(request, "Model not found.")
         except Exception as e:
             messages.error(request, f"Error updating model status: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
     
     return redirect('{}?tab=model-management'.format(reverse('algorithm_setting')))
+
 
 #*************************************************************
 
@@ -5633,3 +5862,32 @@ def get_feature_importance():
 
 
 #**************************************************
+
+
+
+
+@admin_required
+def get_old_models_list(request):
+    """Get list of old model versions"""
+    old_models_dir = os.path.join(settings.BASE_DIR, 'xg_boost', 'old_version_model')
+    
+    old_models = []
+    if os.path.exists(old_models_dir):
+        for filename in os.listdir(old_models_dir):
+            if filename.endswith('.pkl'):
+                filepath = os.path.join(old_models_dir, filename)
+                size_mb = os.path.getsize(filepath) / (1024 * 1024)
+                modified_time = os.path.getmtime(filepath)
+                
+                old_models.append({
+                    'filename': filename,
+                    'size_mb': round(size_mb, 2),
+                    'modified': datetime.fromtimestamp(modified_time),
+                    'path': filepath,
+                })
+    
+    # Sort by version number (extracted from filename)
+    old_models.sort(key=lambda x: int(x['filename'].replace('xgboost_model_', '').replace('.pkl', '')) 
+                    if x['filename'].replace('xgboost_model_', '').replace('.pkl', '').isdigit() else 0)
+    
+    return JsonResponse({'old_models': old_models})
