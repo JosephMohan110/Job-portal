@@ -67,6 +67,9 @@ urlpatterns = [
     path('algorithm/collect-data/', views.collect_data_now, name='collect_data_now'),
 
 
+    path('algorithm/old-models/', views.get_old_models_list, name='get_old_models_list'),
+
+
 
 
 
